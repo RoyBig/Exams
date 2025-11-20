@@ -21,18 +21,22 @@ public class SubjectService {
     public List<Subject> GetAll(){
         return subjectRepository.findAll();
     }
-    public Subject Get(int questionID){
-        Optional<Subject> existingSubjectOptional = subjectRepository.findById(questionID);
+
+    public Subject Get(String subjectId){
+        Optional<Subject> existingSubjectOptional = subjectRepository.findById(subjectId);
         return existingSubjectOptional.orElse(null);
     }
+
     public List<Subject> getAllSubjects() {
         return subjectRepository.findAll();
     }
-    public Subject getSubjectById(int id) {
+
+    public Subject getSubjectById(String id) {
         Optional<Subject> existingSubjectOptional = subjectRepository.findById(id);
         return existingSubjectOptional.orElse(null);
     }
-    public Subject GetOne(int id){
+
+    public Subject GetOne(String id){
         Optional<Subject> existingSubject = subjectRepository.findById(id);
         return existingSubject.orElse(null);
     }

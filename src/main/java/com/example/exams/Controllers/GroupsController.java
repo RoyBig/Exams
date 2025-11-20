@@ -9,6 +9,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import java.util.List;
 import java.util.stream.Collectors;
+
 import org.springframework.stereotype.Controller;
 
 
@@ -17,13 +18,13 @@ public class GroupsController {
     final StudentsService studentsService;
     final GroupsService groupsService;
 
-    public GroupsController(StudentsService studentsService, GroupsService groupsService){
+    public GroupsController(StudentsService studentsService, GroupsService groupsService) {
         this.studentsService = studentsService;
         this.groupsService = groupsService;
     }
 
     @GetMapping("/groups")
-    public ModelAndView groups(){
+    public ModelAndView groups() {
         ModelAndView modelAndView = new ModelAndView();
         List<Group> groups = groupsService.getAllGroups();
         modelAndView.addObject("groups", groups);
@@ -33,7 +34,7 @@ public class GroupsController {
     }
 
     @GetMapping("/addGroup")
-    public ModelAndView addGroups(){
+    public ModelAndView addGroups() {
         ModelAndView modelAndView = new ModelAndView();
         Group group = new Group();
         List<Student> students = studentsService.getAllStudents();
@@ -44,19 +45,20 @@ public class GroupsController {
     }
 
     @PostMapping("/addGroup")
-    public String addGroup(@ModelAttribute("group") Group group){
+    public String addGroup(@ModelAttribute("group") Group group) {
         System.out.println("Adding students to group: " + group.getStudents());
         groupsService.addGroup(group);
         return "redirect:/groups";
     }
+
     @GetMapping("/deleteGroup/{groupId}")
-    public String deleteGroup(@PathVariable Integer groupId){
+    public String deleteGroup(@PathVariable String groupId) {
         groupsService.deleteGroup(groupId);
         return "redirect:/groups";
     }
 
     @GetMapping("/manageGroup/{groupId}")
-    public ModelAndView manageGroup(@PathVariable Integer groupId){
+    public ModelAndView manageGroup(@PathVariable String groupId) {
         ModelAndView modelAndView = new ModelAndView();
 
         Group group = this.groupsService.getGroupByGroupId(groupId);
@@ -76,7 +78,7 @@ public class GroupsController {
     }
 
     @GetMapping("/addStudentToGroup/{groupId}")
-    public ModelAndView addStudent(@PathVariable Integer groupId){
+    public ModelAndView addStudent(@PathVariable Integer groupId) {
         ModelAndView modelAndView = new ModelAndView();
         modelAndView.setViewName("addStudentToGroup");
         modelAndView.addObject("groupId", groupId);
@@ -88,38 +90,39 @@ public class GroupsController {
     }
 
     @GetMapping("/addStudentsToGroup")
-    public String addStudentsToGroup(@RequestParam("groupId") int groupId, @RequestParam("StudentsToAdd") List<Integer> studentIds) {
-        groupsService.addStudentsToGroup(groupId,studentIds);
+    public String addStudentsToGroup(@RequestParam("groupId") String groupId, @RequestParam("StudentsToAdd") List<String> studentIds) {
+        groupsService.addStudentsToGroup(groupId, studentIds);
         return "redirect:/manageGroup/" + groupId;
     }
 
 
     @PostMapping("/addStudent")
-    public String addStudent(@RequestParam("groupId") String groupId, @RequestParam("studentId") Integer studentId) {
+    public String addStudent(@RequestParam("groupId") String groupId, @RequestParam("studentId") String studentId) {
         System.out.println(groupId);
         System.out.println(studentId);
-        try{
-            int parsedGroupId = Integer.parseInt(groupId);
+        try {
+            String parsedGroupId = groupId;
             this.groupsService.addStudent(parsedGroupId, studentId);
-        }catch(NumberFormatException e){
+        } catch (NumberFormatException e) {
             System.err.println("Parsing error - groupId: " + groupId);
         }
         return "redirect:/manageGroup/" + groupId;
     }
+
     @PostMapping("/deleteStudent")
-    public String deleteStudent(@RequestParam("groupId") String groupId, @RequestParam("studentId") String studentId){
+    public String deleteStudent(@RequestParam("groupId") String groupId, @RequestParam("studentId") String studentId) {
         try {
-            int parsedGroupId = Integer.parseInt(groupId);
-            int parsedStudentId = Integer.parseInt(studentId);
+            String parsedGroupId = groupId;
+            String parsedStudentId = studentId;
             this.groupsService.removeStudent(parsedGroupId, parsedStudentId);
-        }catch (NumberFormatException e) {
+        } catch (NumberFormatException e) {
             System.err.println("Parsing error - groupId: " + groupId);
         }
         return "redirect:/manageGroup/" + groupId;
     }
 
     @GetMapping("/editStudent/{groupId}/{studentId}")
-    public ModelAndView showEditStudentForm(@PathVariable Integer groupId, @PathVariable Integer studentId){
+    public ModelAndView showEditStudentForm(@PathVariable Integer groupId, @PathVariable String studentId) {
         ModelAndView modelAndView = new ModelAndView();
 
         Student student = this.studentsService.getStudentById(studentId);
@@ -130,9 +133,10 @@ public class GroupsController {
         modelAndView.setViewName("editStudent");
         return modelAndView;
     }
+
     @PostMapping("/editStudent")
-    public String editStudent(@ModelAttribute("editedStudent") Student editedStudent, @ModelAttribute("groupId") String groupId){
-        Integer studentId = editedStudent.getStudentId();
+    public String editStudent(@ModelAttribute("editedStudent") Student editedStudent, @ModelAttribute("groupId") String groupId) {
+        String studentId = editedStudent.getStudentId();
         String firstName = editedStudent.getFirstname();
         String lastName = editedStudent.getLastname();
         String login = editedStudent.getLogin();

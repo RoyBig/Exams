@@ -1,45 +1,43 @@
 package com.example.exams.Model.Data.db;
 
-import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.DBRef;
+import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 @Getter
 @Setter
-@Entity
+@Document(collection = "answerclosed")
 @NoArgsConstructor
-@Table(name = "answerclosed")
 public class Answerclosed {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "answerid", nullable = false)
-    private Integer id;
 
-    @Column(name = "description", length = 100)
+    @Id
+    private String id;
+
+    @Field(name = "description")
     private String description;
 
-    @Column(name = "isCorrect")
+    @Field(name = "isCorrect")
     private boolean isCorrect;
 
-    @ManyToOne(fetch = FetchType.EAGER, optional = false)
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    @JoinColumn(name = "closedquestion_questionid", nullable = false)
+    @DBRef
+    @Field(name = "closedquestionQuestionid")
     private Closedquestion closedquestionQuestionid;
 
-    public Answerclosed(Integer answerId, String description, boolean correct, Closedquestion question) {
-        this.id = answerId;
+    public Answerclosed(String id, String description, boolean isCorrect, Closedquestion closedquestionQuestionid) {
+        this.id = id;
         this.description = description;
-        this.isCorrect = correct;
-        this.closedquestionQuestionid = question;
+        this.isCorrect = isCorrect;
+        this.closedquestionQuestionid = closedquestionQuestionid;
     }
 
     @Override
     public String toString() {
         return "Answerclosed{" +
-                "id=" + id +
+                "id='" + id + '\'' +
                 ", description='" + description + '\'' +
                 ", isCorrect=" + isCorrect +
                 ", closedquestionQuestionid=" + closedquestionQuestionid +

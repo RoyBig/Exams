@@ -1,7 +1,5 @@
 package com.example.exams.Services;
 
-//import com.example.exams.Model.Data.ProperDataModels.ProblemDTO;
-
 import com.example.exams.Model.Data.ProperDataModels.ProblemCategories;
 import com.example.exams.Model.Data.ProperDataModels.ProblemStatus;
 import com.example.exams.Model.Data.ProperDataModels.ShowProblem;
@@ -30,11 +28,11 @@ public class ProblemService {
         return problemRepository.findAll();
     }
 
-    public Problem findById(int id) {
-        return problemRepository.getReferenceById(id);
+    public Problem findById(String id) {
+        return problemRepository.findById(id).orElse(null);
     }
 
-    public Problem changeStatus(int id, ProblemStatus problemStatus) {
+    public Problem changeStatus(String id, ProblemStatus problemStatus) {
         Problem problem = findById(id);
         problem.setStatus(problemStatus);
         return problemRepository.save(problem);
@@ -50,6 +48,7 @@ public class ProblemService {
 
         return filteredProblemsByCategory;
     }
+
     public static Map<String, List<ShowProblem>> getProblemsBySelectedStatus(Map<String, List<ShowProblem>> problemsByStatus, String selectedStatus) {
         Map<String, List<ShowProblem>> filteredProblemsByCategory = new HashMap<>();
         if (selectedStatus == null || selectedStatus.isEmpty() || selectedStatus.equals("")) {
@@ -73,6 +72,7 @@ public class ProblemService {
 
         return filteredProblemsByCategory;
     }
+
     public Map<String, List<ShowProblem>> getProblemsByCategoryAndStatus(Map<String, List<ShowProblem>> problemsByCategory, String selectedCategory, String selectedStatus) {
         Map<String, List<ShowProblem>> filteredProblemsByCategory = new HashMap<>();
 
@@ -108,6 +108,7 @@ public class ProblemService {
                 .map(Enum::name)
                 .collect(Collectors.toList());
     }
+
     public List<String> getUniqueStatuses() {
         return Arrays.stream(ProblemStatus.values())
                 .map(Enum::name)

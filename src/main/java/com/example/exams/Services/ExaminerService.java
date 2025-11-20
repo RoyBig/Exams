@@ -1,7 +1,6 @@
 package com.example.exams.Services;
 
 import com.example.exams.Model.Data.db.Examiner;
-import com.example.exams.Model.Data.db.Student;
 import com.example.exams.Repositories.Db.ExaminerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,8 +21,8 @@ public class ExaminerService {
         return examinersRepository.findAll();
     }
 
-    public Examiner Get(int id){
-        Optional <Examiner> examiner = examinersRepository.findById(id);
+    public Examiner Get(String id){
+        Optional<Examiner> examiner = examinersRepository.findById(id);
         return examiner.orElse(null);
     }
 
@@ -35,25 +34,23 @@ public class ExaminerService {
         return examinersRepository.findByLogin(name);
     }
 
-    public void activate(int id){
-        Optional <Examiner> examiner = examinersRepository.findById(id);
+    public void activate(String id){
+        Optional<Examiner> examiner = examinersRepository.findById(id);
         if(examiner.isPresent()){
             examiner.get().setVerificationStatus(true);
             examinersRepository.save(examiner.get());
         }
     }
 
-    public void deactivate(int id){
-        Optional <Examiner> examiner = examinersRepository.findById(id);
+    public void deactivate(String id){
+        Optional<Examiner> examiner = examinersRepository.findById(id);
         if(examiner.isPresent()){
             examiner.get().setVerificationStatus(false);
             examinersRepository.save(examiner.get());
         }
     }
 
-
-
-    public void editExaminer(Integer examinerId, String firstName, String lastName, String login, String password, String email){
+    public void editExaminer(String examinerId, String firstName, String lastName, String login, String password, String email){
         Examiner examiner = examinersRepository.findExaminerById(examinerId);
 
         if(examiner != null){
@@ -76,7 +73,7 @@ public class ExaminerService {
         }
     }
 
-    public void deleteExaminer(int id){
+    public void deleteExaminer(String id){
         examinersRepository.deleteById(id);
     }
 }

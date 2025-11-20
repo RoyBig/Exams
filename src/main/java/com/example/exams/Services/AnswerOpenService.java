@@ -14,15 +14,18 @@ import java.util.stream.Collectors;
 public class AnswerOpenService {
 
     private final StudentopenanswerRepository studentopenanswerRepository;
-
     private final LogstudentexamRepository logstudentexamRepository;
+
     @Autowired
-    public AnswerOpenService(StudentopenanswerRepository studentopenanswerRepository, LogstudentexamRepository logstudentexamRepository){
+    public AnswerOpenService(StudentopenanswerRepository studentopenanswerRepository,
+                             LogstudentexamRepository logstudentexamRepository) {
         this.studentopenanswerRepository = studentopenanswerRepository;
         this.logstudentexamRepository = logstudentexamRepository;
     }
-    public List<Student> getAllDistinctStudentsForOpenQuestions(int examId) {
-        List<Studentopenanswer> studentopenanswers = studentopenanswerRepository.findAllByOpenquestionQuestionid_Exam_Id(examId);
+
+    public List<Student> getAllDistinctStudentsForOpenQuestions(String examId) {
+        List<Studentopenanswer> studentopenanswers =
+                studentopenanswerRepository.findAllByOpenquestionQuestionid_Exam_Id(examId);
 
         Set<Student> uniqueStudents = studentopenanswers.stream()
                 .map(Studentopenanswer::getStudentStudent)
@@ -30,19 +33,21 @@ public class AnswerOpenService {
 
         return sortByStudentId(List.copyOf(uniqueStudents));
     }
+
     public List<Student> sortByStudentId(List<Student> students) {
         List<Student> mutableList = new ArrayList<>(students);
         mutableList.sort(Comparator.comparing(Student::getStudentId));
         return mutableList;
     }
 
-    public List<Studentopenanswer> getStudentOpenAnswerByStudent(Student student){
+    public List<Studentopenanswer> getStudentOpenAnswerByStudent(Student student) {
         return studentopenanswerRepository.findAllByStudentStudent(student);
     }
 
     public int updateScores(Student student, List<Integer> scores) {
         List<Studentopenanswer> studentOpenAnswers = getStudentOpenAnswerByStudent(student);
         int points = 0;
+
         if (studentOpenAnswers.size() != scores.size()) {
             throw new IllegalArgumentException("List sizes do not match");
         }
@@ -50,18 +55,18 @@ public class AnswerOpenService {
         for (int i = 0; i < studentOpenAnswers.size(); i++) {
             Studentopenanswer answer = studentOpenAnswers.get(i);
             Integer score = scores.get(i);
-            if (answer.getScore() == null){
+
+            if (answer.getScore() == null) {
                 answer.setScore(score);
                 points += score;
-            }else{
-                int a = answer.getScore();
+            } else {
+                int previous = answer.getScore();
                 answer.setScore(score);
-                points += score - a;
+                points += score - previous;
             }
             studentopenanswerRepository.save(answer);
         }
 
         return points;
-
     }
 }

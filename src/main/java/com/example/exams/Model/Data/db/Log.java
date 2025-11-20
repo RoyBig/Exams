@@ -1,38 +1,37 @@
 package com.example.exams.Model.Data.db;
 
-import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.Date;
 
 @Getter
 @Setter
-@Entity
-@Table(name = "logs")
+@Document(collection = "logs")
 public class Log {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "logsid", nullable = false)
-    private Integer id;
 
-    @Column(name = "description", length = 400)
+    @Id
+    private String id;
+
+    @Field(name = "description")
     private String description;
 
-    @Column(name = "Date")
+    @Field(name = "date")
     private LocalDate date;
 
-    @Column(name = "Time", columnDefinition = "TIME")
+    @Field(name = "time")
     private LocalTime time;
 
     public Log() {
     }
+
     public Log(String description) {
         this.description = description;
         this.date = LocalDate.now();
         this.time = LocalTime.now().withNano(0);
     }
-
 }

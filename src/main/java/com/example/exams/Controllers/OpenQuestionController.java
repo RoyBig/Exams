@@ -29,7 +29,7 @@ public class OpenQuestionController {
     LogsService logsService;
 
     @GetMapping("/editOpenQuestion/{openQuestionId}")
-    public ModelAndView EditOpenQuestion(@PathVariable Integer openQuestionId){
+    public ModelAndView EditOpenQuestion(@PathVariable String openQuestionId){
         OpenQuestion openQuestion = openQuestionService.GetOpenQuestion(openQuestionId);
         ModelAndView modelAndView = new ModelAndView();
         modelAndView.setViewName("editOpenQuestion");
@@ -38,7 +38,7 @@ public class OpenQuestionController {
     }
 
     @PostMapping("/updateOpenQuestion/{openQuestionId}")
-    public String UpdateOpenQuestion(@ModelAttribute OpenQuestion openQuestion, @PathVariable Integer openQuestionId){
+    public String UpdateOpenQuestion(@ModelAttribute OpenQuestion openQuestion, @PathVariable String openQuestionId){
         logsService.updateOpenQuestion(openQuestion,openQuestionId);
         openQuestion.setOpenQuestionId(openQuestionId);
         OpenQuestion updatedOpenQuestionOptional = openQuestionService.UpdateOpenQuestion(openQuestion);
@@ -69,7 +69,7 @@ public class OpenQuestionController {
     }
 
     @GetMapping("/deleteOpenQuestion/{openQuestionId}")
-    public ResponseEntity<String> deleteOpenQuestion(@PathVariable Integer openQuestionId) {
+    public ResponseEntity<String> deleteOpenQuestion(@PathVariable String openQuestionId) {
         boolean deleted = openQuestionService.deleteOpenQuestion(openQuestionId);
         if (deleted) {
             return ResponseEntity.ok("Question deleted successfully");
@@ -81,13 +81,13 @@ public class OpenQuestionController {
     public String processOpenQuestionForm(@RequestParam("action") String action) {
         String[] parts = action.split(":");
         String command = parts[0];
-        Integer openQuestionId = Integer.parseInt(parts[1]);
+        String openQuestionId = parts[1];
         if ("edit".equals(command)) {
             return "redirect:/editOpenQuestion/" + openQuestionId;
         } else if ("delete".equals(command) && parts.length == 3) {
             Integer examId = Integer.parseInt(parts[2]);
             studentOpenAnswerService.deleteAllAnswersByQuestionId(openQuestionId);
-            logsService.deleteOpenQuestion(openQuestionId.intValue());
+            logsService.deleteOpenQuestion(openQuestionId);
             openQuestionService.deleteOpenQuestion(openQuestionId);
             return "redirect:/showExamDetails/" + examId;
         }

@@ -26,7 +26,7 @@ public class ExamResultController {
     }
 
     @GetMapping("/api/exam/{examId}/grades")
-    public Map<String, Integer> getExamGradesData(@PathVariable int examId) {
+    public Map<String, Integer> getExamGradesData(@PathVariable String examId) {
         Map<String, Integer> grades = new HashMap<>();
         grades.put("A", logstudentexamService.getAGrades(examId));
         grades.put("B+", logstudentexamService.getBPlusGrades(examId));

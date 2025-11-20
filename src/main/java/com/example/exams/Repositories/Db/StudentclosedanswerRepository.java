@@ -1,32 +1,28 @@
 package com.example.exams.Repositories.Db;
 
-import com.example.exams.Model.Data.db.Closedquestion;
-import com.example.exams.Model.Data.db.Student;
 import com.example.exams.Model.Data.db.Studentclosedanswer;
-
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
+import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.data.mongodb.repository.Query;
+import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-public interface StudentclosedanswerRepository extends JpaRepository<Studentclosedanswer, Integer> {
-    List<Studentclosedanswer> findAllByAnswerclosedAnswerid_ClosedquestionQuestionid_Exam_Id(int examId);
+@Repository
+public interface StudentclosedanswerRepository extends MongoRepository<Studentclosedanswer, String> {
 
-    List<Studentclosedanswer> findAllByAnswerclosedAnswerid_ClosedquestionQuestionid_Exam_Id_AndStudentStudent_StudentId(int examId, int studentId);
+    List<Studentclosedanswer> findAllByAnswerclosedAnswerid_ClosedquestionQuestionid_Exam_Id(String examId);
 
+    List<Studentclosedanswer> findAllByAnswerclosedAnswerid_ClosedquestionQuestionid_Exam_Id_AndStudentStudent_StudentId(
+            String examId,
+            String studentId
+    );
 
-
-    @Modifying
     @Transactional
-    @Query("delete from Studentclosedanswer s where s.answerclosedAnswerid.closedquestionQuestionid.id = :questionId")
-    void deleteByQuestionId(@Param("questionId") int questionId);
+    @Query(value = "{ 'closedquestion_questionid.$id' : ?0 }", delete = true)
+    void deleteByQuestionId(String questionId);
 
-    @Modifying
     @Transactional
-    @Query("delete from Studentclosedanswer s where s.id = :answerId")
-    void deleteByAnswerId(@Param("answerId") int answerId);
-
+    @Query(value = "{ '_id' : ?0 }", delete = true)
+    void deleteByAnswerId(String answerId);
 }

@@ -7,14 +7,15 @@ import lombok.Setter;
 @Getter
 @Setter
 public class OpenQuestionDTO {
-    private Integer questionid;
+
+    private String questionid;
 
     @JsonProperty("content")
     private String content;
 
     @JsonProperty("score")
     private Integer score;
-    private Integer subjectId;
-    private Integer examId;
-}
 
+    private String subjectId;
+    private String examId;
+}

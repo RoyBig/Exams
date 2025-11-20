@@ -75,9 +75,10 @@ public class UsersService {
         return examinersRepository.findByLogin(login);
     }
 
-    public Student getStudentByid(int id){
+    public Student getStudentByid(String id){
         return studentsEntityRepository.findById(id).orElse(null);
     }
+
     public Student getStudentByEmail(String studentEmail) {
         List<Student> students = studentsEntityRepository.findAll();
         for (Student student : students) {

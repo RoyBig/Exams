@@ -1,14 +1,19 @@
 package com.example.exams.Repositories.Db;
 
 import com.example.exams.Model.Data.db.Student;
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-public interface StudentsEntityRepository extends JpaRepository<Student, Integer> {
-    Student findStudentByLogin(String login);
-    Student findStudentByLoginAndEmail(String login, String email);
-    List<Student> findAll();
-    Student findStudentByStudentId(Integer studentId);
+@Repository
+public interface StudentsEntityRepository extends MongoRepository<Student, String> {
 
+    Student findStudentByLogin(String login);
+
+    Student findStudentByLoginAndEmail(String login, String email);
+
+    List<Student> findAll();
+
+    Student findStudentByStudentId(String studentId);
 }

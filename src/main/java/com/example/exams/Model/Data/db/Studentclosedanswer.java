@@ -1,43 +1,44 @@
 package com.example.exams.Model.Data.db;
 
-import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.DBRef;
+import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.time.LocalDate;
 
 @Getter
 @Setter
-@Entity
-@Table(name = "studentclosedanswer")
+@Document(collection = "studentclosedanswer")
 public class Studentclosedanswer {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "answerid_1", nullable = false)
-    private Integer id;
 
-    @Column(name = "correctness", nullable = false)
+    @Id
+    private String id;
+
+    @Field(name = "correctness")
     private Boolean correctness;
 
-    @Column(name = "Date", nullable = false)
+    @Field(name = "date")
     private LocalDate date;
 
-    @ManyToOne(fetch = FetchType.EAGER, optional = false)
-    @JoinColumn(name = "answerclosed_answerid", nullable = false)
+    @DBRef
+    @Field(name = "answerclosed_answerid")
     private Answerclosed answerclosedAnswerid;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "closedquestion_questionid")
+    @DBRef
+    @Field(name = "closedquestion_questionid")
     private Closedquestion closedquestionQuestionid;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "student_student_id")
+    @DBRef
+    @Field(name = "student_student")
     private Student studentStudent;
 
     @Override
     public String toString() {
         return "Studentclosedanswer{" +
-                "id=" + id +
+                "id='" + id + '\'' +
                 ", correctness=" + correctness +
                 ", date=" + date +
                 ", answerclosedAnswerid=" + answerclosedAnswerid +

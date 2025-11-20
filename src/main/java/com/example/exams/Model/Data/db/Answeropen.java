@@ -1,30 +1,31 @@
 package com.example.exams.Model.Data.db;
 
-import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.DBRef;
+import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 @Getter
 @Setter
-@Entity
-@Table(name = "answeropen")
+@Document(collection = "answeropen")
 public class Answeropen {
-    @Id
-    @Column(name = "answerid", nullable = false)
-    private Integer id;
 
-    @Column(name = "description", length = 100)
+    @Id
+    private String id;
+
+    @Field(name = "description")
     private String description;
 
-    @ManyToOne(fetch = FetchType.EAGER, optional = false)
-    @JoinColumn(name = "openquestion_questionid", nullable = false)
+    @DBRef
+    @Field(name = "openquestionQuestionid")
     private OpenQuestion openquestionQuestionid;
-
 
     @Override
     public String toString() {
         return "Answeropen{" +
-                "id=" + id +
+                "id='" + id + '\'' +
                 ", description='" + description + '\'' +
                 ", openquestionQuestionid=" + openquestionQuestionid +
                 '}';

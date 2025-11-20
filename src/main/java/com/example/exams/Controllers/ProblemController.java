@@ -133,7 +133,7 @@ public class ProblemController {
     }
 
     @GetMapping("/showProblems/{id}")
-    public ModelAndView problemDetails(@PathVariable("id") Integer problemId) {
+    public ModelAndView problemDetails(@PathVariable("id") String problemId) {
         ModelAndView modelAndView = new ModelAndView("problemDetails");
         Problem problem = problemService.findById(problemId);
         byte[] photoBytes = problem.getPhoto();
@@ -145,7 +145,7 @@ public class ProblemController {
     }
 
     @PostMapping("/changeProblemStatus")
-    public String changeProblemStatus(@RequestParam("id") Integer id,
+    public String changeProblemStatus(@RequestParam("id") String id,
                                       @RequestParam("status") ProblemStatus status) {
         problemService.changeStatus(id,status);
         return "redirect:/showProblems";

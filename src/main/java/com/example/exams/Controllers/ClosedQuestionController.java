@@ -37,7 +37,7 @@ LogsService logsService;
     public String processOpenQuestionForm(@RequestParam("action") String action) {
         String[] parts = action.split(":");
         String command = parts[0];
-        Integer closeQuestionId = Integer.parseInt(parts[1]);
+        String closeQuestionId = parts[1];
         if ("edit".equals(command)) {
             return "redirect:/editClosedQuestion/" + closeQuestionId;
         } else if ("delete".equals(command) && parts.length == 3) {
@@ -53,7 +53,7 @@ LogsService logsService;
     }
 
     @GetMapping("/editClosedQuestion/{id}")
-    public ModelAndView editClosedQuestion(@PathVariable Integer id) {
+    public ModelAndView editClosedQuestion(@PathVariable String id) {
         ModelAndView modelAndView = new ModelAndView();
         Closedquestion question = closedQuestionService.getClosedQuestionById(id);
         List<Answerclosed> answers = answerClosedService.getAllByQuestionId(id);
@@ -61,7 +61,7 @@ LogsService logsService;
         AnswerForm answerForm = new AnswerForm();
         answerForm.setQuestion(question);
         answerForm.setAnswers(answers);
-        Integer examId = question.getExam() != null ? question.getExam().getId() : null;
+        String examId = question.getExam() != null ? question.getExam().getId() : null;
         modelAndView.addObject("answerForm", answerForm);
         modelAndView.addObject("examId", examId);
         modelAndView.setViewName("editClosedQuestion");
@@ -70,7 +70,7 @@ LogsService logsService;
 
 
     @PostMapping("/editQuestion")
-    public String saveQuestionChanges(@ModelAttribute("answerForm")  AnswerForm answerForm, Integer examId, BindingResult result, Model model) {
+    public String saveQuestionChanges(@ModelAttribute("answerForm")  AnswerForm answerForm, String examId, BindingResult result, Model model) {
        //
         Closedquestion question = answerForm.getQuestion();
         List<Answerclosed> answercloseds = answerForm.getAnswers();
@@ -97,8 +97,8 @@ LogsService logsService;
     }
 
     @PostMapping("/deleteAnswer")
-    public String deleteAnswer(@RequestParam("answerId") Integer answerId,
-                               @RequestParam("questionId") Integer questionId) {
+    public String deleteAnswer(@RequestParam("answerId") String answerId,
+                               @RequestParam("questionId") String questionId) {
         System.out.println("dziala");
         studentClosedAnswerService.deleteStudentClosedAnswerByAnswerId(answerId);
         answerClosedService.deleteAnswerById(answerId);
@@ -106,7 +106,7 @@ LogsService logsService;
     }
 
     @PostMapping("/addNewAnswer")
-    public String addNewAnswer(@RequestParam("questionId") Integer questionId) {
+    public String addNewAnswer(@RequestParam("questionId") String questionId) {
             Answerclosed newAnswer = answerClosedService.createEmptyAnswerForQuestion(questionId);
         return "redirect:/editClosedQuestion/" + questionId;
     }

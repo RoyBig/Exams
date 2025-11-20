@@ -40,19 +40,19 @@ public class AdministrationController {
     }
 
     @PostMapping("/delete/administrator/{id}")
-    public String deleteAdministrator(@PathVariable int id) {
+    public String deleteAdministrator(@PathVariable String id) {
         administratorService.deleteAdministrator(id);
         return "redirect:/delete";
     }
 
     @PostMapping("/delete/examiner/{id}")
-    public String deleteExaminer(@PathVariable int id) {
+    public String deleteExaminer(@PathVariable String id) {
         examinerService.deleteExaminer(id);
         return "redirect:/delete";
     }
 
     @PostMapping("/delete/student/{id}")
-    public String deleteStudent(@PathVariable int id) {
+    public String deleteStudent(@PathVariable String id) {
         studentsService.deleteStudent(id);
         return "redirect:/delete";
     }

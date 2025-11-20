@@ -2,9 +2,7 @@ package com.example.exams.Services;
 
 import com.example.exams.Model.Data.db.*;
 import com.example.exams.Repositories.Db.LogstudentexamRepository;
-import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -18,14 +16,18 @@ public class LogstudentexamService {
     private final OpenQuestionService openQuestionService;
     private final ExamService examService;
 
-    public LogstudentexamService(LogstudentexamRepository logstudentexamRepository, ClosedQuestionService closedQuestionService, OpenQuestionService openQuestionService, ExamService examService) {
+    @Autowired
+    public LogstudentexamService(LogstudentexamRepository logstudentexamRepository,
+                                 ClosedQuestionService closedQuestionService,
+                                 OpenQuestionService openQuestionService,
+                                 ExamService examService) {
         this.logstudentexamRepository = logstudentexamRepository;
         this.closedQuestionService = closedQuestionService;
         this.openQuestionService = openQuestionService;
         this.examService = examService;
     }
 
-    public List<Logstudentexam> getStudentExamHistory(Integer id) {
+    public List<Logstudentexam> getStudentExamHistory(String id) {
         return logstudentexamRepository.findByStudentStudentId(id);
     }
 
@@ -34,21 +36,22 @@ public class LogstudentexamService {
     }
 
     public void setDateTimeExaminerComment(Student student, Exam exam, String examinerComment){
-        Logstudentexam logstudentexam = logstudentexamRepository.findLogstudentexamByStudentStudentAndExamExamid(student, exam);
+        Logstudentexam logstudentexam = logstudentexamRepository
+                .findLogstudentexamByStudentStudentAndExamExamid(student, exam);
         logstudentexam.setDate(LocalDate.now());
         logstudentexam.setTime(LocalTime.now());
         logstudentexam.setDescription(examinerComment);
         logstudentexamRepository.save(logstudentexam);
     }
 
-
     public void addOpenPoints(Student student, Exam exam, Integer openPoints){
-        Logstudentexam logstudentexam = logstudentexamRepository.findLogstudentexamByStudentStudentAndExamExamid(student, exam);
+        Logstudentexam logstudentexam = logstudentexamRepository
+                .findLogstudentexamByStudentStudentAndExamExamid(student, exam);
         int score;
 
         if (logstudentexam.getScoreresult() == null){
             score = 0;
-        }else{
+        } else {
             score = logstudentexam.getScoreresult();
         }
         int finalResult = score + openPoints;
@@ -56,8 +59,7 @@ public class LogstudentexamService {
         logstudentexamRepository.save(logstudentexam);
     }
 
-
-    public void addPointsToLogstudentexam(int logstudentexamId, int points) {
+    public void addPointsToLogstudentexam(String logstudentexamId, int points) {
         Logstudentexam logstudentexam = logstudentexamRepository.findById(logstudentexamId)
                 .orElseThrow(() -> new IllegalArgumentException("Nie znaleziono Logstudentexam o ID: " + logstudentexamId));
 
@@ -65,7 +67,7 @@ public class LogstudentexamService {
         logstudentexamRepository.save(logstudentexam);
     }
 
-    public Integer createAndSaveLogstudentexam(Exam examExamid, Student studentStudent) {
+    public String createAndSaveLogstudentexam(Exam examExamid, Student studentStudent) {
         Logstudentexam newLogstudentexam = new Logstudentexam();
         newLogstudentexam.setDate(LocalDate.now());
         newLogstudentexam.setTime(LocalTime.now());
@@ -74,29 +76,29 @@ public class LogstudentexamService {
         logstudentexamRepository.save(newLogstudentexam);
         return newLogstudentexam.getId();
     }
-    @Transactional
+
     public void deleteAllLogsForExam(Exam exam) {
         logstudentexamRepository.deleteByExamExamid(exam);
     }
 
-    public boolean existsByExamIdAndStudentId(Integer examId, Integer studentId) {
+    public boolean existsByExamIdAndStudentId(String examId, String studentId) {
         return logstudentexamRepository.existsByExamExamid_IdAndStudentStudent_Id(examId, studentId);
     }
 
-    public int getExamMaximumScore(int exam){
-        List<Closedquestion> closedQuestions = closedQuestionService.getAllByExamId(exam);
-        List<OpenQuestion> openQuestions = openQuestionService.getAllByExamId(exam);
+    public int getExamMaximumScore(String examId){
+        List<Closedquestion> closedQuestions = closedQuestionService.getAllByExamId(examId);
+        List<OpenQuestion> openQuestions = openQuestionService.getAllByExamId(examId);
         int maximumScore = 0;
-        for(int i = 0; i < closedQuestions.size(); ++i){
+        for (int i = 0; i < closedQuestions.size(); ++i){
             maximumScore += closedQuestions.get(i).getScore();
         }
-        for(int i = 0; i < openQuestions.size(); ++i){
+        for (int i = 0; i < openQuestions.size(); ++i){
             maximumScore += openQuestions.get(i).getScore();
         }
         return maximumScore;
     }
 
-    private int getXGrades(int examId, float multiplier){
+    private int getXGrades(String examId, float multiplier){
         int maximumScore = getExamMaximumScore(examId);
         Exam exam = examService.GetExam(examId);
         List<Logstudentexam> logstudentexams = logstudentexamRepository.findLogstudentexamsByExamExamid(exam);
@@ -118,22 +120,27 @@ public class LogstudentexamService {
         return xGrades;
     }
 
-    public int getAGrades(int examId){
+    public int getAGrades(String examId){
         return getXGrades(examId, 0.9f);
     }
-    public int getBPlusGrades(int examId){
+
+    public int getBPlusGrades(String examId){
         return getXGrades(examId, 0.8f);
     }
-    public int getBGrades(int examId){
+
+    public int getBGrades(String examId){
         return getXGrades(examId, 0.7f);
     }
-    public int getCPlusGrades(int examId){
+
+    public int getCPlusGrades(String examId){
         return getXGrades(examId, 0.6f);
     }
-    public int getCGrades(int examId){
+
+    public int getCGrades(String examId){
         return getXGrades(examId, 0.5f);
     }
-    public int getDGrades(int examId){
+
+    public int getDGrades(String examId){
         int maximumScore = getExamMaximumScore(examId);
         Exam exam = examService.GetExam(examId);
         List<Logstudentexam> logstudentexams = logstudentexamRepository.findLogstudentexamsByExamExamid(exam);
@@ -149,5 +156,3 @@ public class LogstudentexamService {
         return DGrades;
     }
 }
-
-

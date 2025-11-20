@@ -10,6 +10,7 @@ import java.util.List;
 
 @Service
 public class GroupsService {
+
     @Autowired
     GroupEntityRepository groupsRepository;
 
@@ -20,22 +21,23 @@ public class GroupsService {
         return groupsRepository.findAll();
     }
 
-    public Group getGroupByGroupId(Integer groupId) {
+    public Group getGroupByGroupId(String groupId) {
         return groupsRepository.findGroupById(groupId);
     }
 
-    public void removeStudent(Integer groupId, Integer studentId) {
+    public void removeStudent(String groupId, String studentId) {
         Group group = groupsRepository.findGroupById(groupId);
         Student student = studentsService.getStudentById(studentId);
 
-        if(group != null && student != null) {
-            if(group.getStudents().contains(student)){
+        if (group != null && student != null) {
+            if (group.getStudents().contains(student)) {
                 group.getStudents().remove(student);
                 groupsRepository.save(group);
             }
         }
     }
-    public void addStudentsToGroup(Integer groupId, List<Integer> studentIds) {
+
+    public void addStudentsToGroup(String groupId, List<String> studentIds) {
         Group group = groupsRepository.findGroupById(groupId);
 
         if (group != null) {
@@ -47,28 +49,27 @@ public class GroupsService {
                         group.getStudents().add(student);
                     }
                 }
-
                 groupsRepository.save(group);
             }
         }
     }
 
-
-    public void addStudent(Integer groupId, Integer studentId) {
+    public void addStudent(String groupId, String studentId) {
         Group group = groupsRepository.findGroupById(groupId);
         Student student = studentsService.getStudentById(studentId);
 
-        if(group != null && student != null) {
-            if(!group.getStudents().contains(student)){
+        if (group != null && student != null) {
+            if (!group.getStudents().contains(student)) {
                 group.getStudents().add(student);
                 groupsRepository.save(group);
             }
         }
     }
-    public boolean deleteGroup(Integer groupId) {
+
+    public boolean deleteGroup(String groupId) {
         Group group = getGroupByGroupId(groupId);
         List<Student> addedStudents = group.getStudents();
-        for(int i=0;i<addedStudents.size();i++){
+        for (int i = 0; i < addedStudents.size(); i++) {
             removeStudent(groupId, addedStudents.get(i).getStudentId());
         }
         if (groupsRepository.existsById(groupId)) {

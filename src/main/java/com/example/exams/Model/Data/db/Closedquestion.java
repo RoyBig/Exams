@@ -1,43 +1,34 @@
 package com.example.exams.Model.Data.db;
 
-import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
-
-import java.util.ArrayList;
-import java.util.List;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.DBRef;
+import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 @Getter
 @Setter
-@Entity
+@Document(collection = "closedquestion")
 @NoArgsConstructor
-@Table(name = "closedquestion")
 public class Closedquestion {
+
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "closed_question_id", nullable = false)
-    private Integer id;
+    private String id;
 
-
-
-    @Column(name = "content", length = 100)
+    @Field(name = "content")
     private String content;
 
-    @Column(name = "score")
+    @Field(name = "score")
     private Integer score;
 
-
-
-    @ManyToOne(fetch = FetchType.EAGER,optional = true)
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    @JoinColumn(name = "exam_id", nullable = true)
+    @DBRef
+    @Field(name = "exam")
     private Exam exam;
 
-    public Closedquestion(Integer closed_question_id, String content, Integer score, Exam exam) {
-        this.id = closed_question_id;
+    public Closedquestion(String id, String content, Integer score, Exam exam) {
+        this.id = id;
         this.content = content;
         this.score = score;
         this.exam = exam;
@@ -46,7 +37,7 @@ public class Closedquestion {
     @Override
     public String toString() {
         return "Closedquestion{" +
-                "id=" + id +
+                "id='" + id + '\'' +
                 ", content='" + content + '\'' +
                 ", score=" + score +
                 ", exam=" + exam +

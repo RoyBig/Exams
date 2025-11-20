@@ -1,41 +1,40 @@
 package com.example.exams.Model.Data.db;
 
-import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 @Getter
 @Setter
-@Entity
-@Table(name = "administrator")
+@Document(collection = "administrator")
 public class Administrator {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "administrator_id", nullable = false)
-    private Integer administrator_id;
+    private String administratorId;
 
-    @Column(name = "firstname", nullable = false, length = 20)
+    @Field(name = "firstname")
     private String firstname;
 
-    @Column(name = "lastname", length = 20)
+    @Field(name = "lastname")
     private String lastname;
 
-    @Column(name = "login", length = 20)
+    @Field(name = "login")
     private String login;
 
-    @Column(name = "password", length = 20)
+    @Field(name = "password")
     private String password;
 
-    @Column(name = "email", length = 40)
+    @Field(name = "email")
     private String email;
 
-    @Column(name = "verification_status", nullable = false)
+    @Field(name = "verification_status")
     private boolean verificationStatus;
 
     public Administrator() {}
 
-    public Administrator(Integer administrator_id, String firstname, String lastname, String login, String password, String email, boolean verificationStatus) {
-        this.administrator_id = administrator_id;
+    public Administrator(String administratorId, String firstname, String lastname, String login, String password, String email, boolean verificationStatus) {
+        this.administratorId = administratorId;
         this.firstname = firstname;
         this.lastname = lastname;
         this.login = login;

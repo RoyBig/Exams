@@ -2,22 +2,19 @@ package com.example.exams.Controllers;
 
 
 import com.example.exams.Model.Data.ProperDataModels.ExamDTO;
+import com.example.exams.Model.Data.ProperDataModels.ExamResponseDTO;
 import com.example.exams.Model.Data.db.*;
-import com.example.exams.Repositories.Db.*;
 import com.example.exams.Services.*;
 import com.example.exams.SpringSecurity.CustomUserDetails;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
-import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -29,9 +26,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.servlet.ModelAndView;
-import com.example.exams.Model.Data.ProperDataModels.ExamResponseDTO;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import org.thymeleaf.standard.expression.Each;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -40,7 +35,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.*;
-import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
 @Controller
@@ -121,8 +115,8 @@ public class ExamController {
                         .registerModule(new Jdk8Module())
                         .registerModule(new JavaTimeModule());
                 ExamDTO exam = objectMapper.readValue(decodedString, ExamDTO.class);
-                exam.setEgzamiantor(examinerService.findByLogin(authentication.getName()).getExaminer_id());
-                exam.setAdministator(administartorService.getAdminByLogin(authentication.getName()).getAdministrator_id());
+                exam.setEgzamiantor(examinerService.findByLogin(authentication.getName()).getExaminerId());
+                exam.setAdministator(administartorService.getAdminByLogin(authentication.getName()).getAdministratorId());
 
                 UserDetails user = null;
                 HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
@@ -170,18 +164,18 @@ public class ExamController {
 //    }
 
     @PostMapping("/editExamDetails/{examId}")
-    public String editExamDetails(@PathVariable Integer examId, @RequestParam("exampoolstrategy") Boolean exampoolstrategy, @RequestParam("count") Integer exampool, @ModelAttribute Exam exam, @RequestParam("subject") Integer subjectId, @RequestParam(value = "startdate", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate, @RequestParam(value = "starttime", required = false) @DateTimeFormat(pattern = "HH:mm") LocalTime startTime, @RequestParam(value = "enddate", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate, @RequestParam(value = "endtime", required = false) @DateTimeFormat(pattern = "HH:mm") LocalTime endTime) {
+    public String editExamDetails(@PathVariable String examId, @RequestParam("exampoolstrategy") Boolean exampoolstrategy, @RequestParam("count") Integer exampool, @ModelAttribute Exam exam, @RequestParam("subject") String subjectId, @RequestParam(value = "startdate", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate, @RequestParam(value = "starttime", required = false) @DateTimeFormat(pattern = "HH:mm") LocalTime startTime, @RequestParam(value = "enddate", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate, @RequestParam(value = "endtime", required = false) @DateTimeFormat(pattern = "HH:mm") LocalTime endTime) {
         String desc = exam.getDescription();
-        exam = examService.GetExam(examId.intValue());
+        exam = examService.GetExam(examId);
         exam.setStartDate(startDate);
         exam.setStartTime(startTime);
         exam.setEndDate(endDate);
         exam.setEndTime(endTime);
-        Subject subject = subjectService.getSubjectById(subjectId.intValue());
+        Subject subject = subjectService.getSubjectById(subjectId);
         exam.setId(examId);
         exam.setExamsSubject(subject);
         exam.setDescription(desc);
-        String s = examService.getExamChange(examService.GetExam(examId.intValue()), exam);
+        String s = examService.getExamChange(examService.GetExam(examId), exam);
         exam.setDuration(Duration.between(LocalDateTime.of(exam.getStartDate(), exam.getStartTime()), LocalDateTime.of(exam.getEndDate(), exam.getEndTime())).toMinutes());
 
         if (s != null) {
@@ -194,7 +188,7 @@ public class ExamController {
     }
 
     @GetMapping("/editExam/{examId}")
-    public ModelAndView editExam(@PathVariable Integer examId, Model model) {
+    public ModelAndView editExam(@PathVariable String examId, Model model) {
         List<Subject> subjects = subjectService.getAllSubjects();
         Exam exam = examService.GetExam(examId);
         ModelAndView modelAndView = new ModelAndView();
@@ -209,29 +203,29 @@ public class ExamController {
     }
 
     @GetMapping("/setExamPoolStrategy/{examId}")
-    public String setExamPoolStrategy(@PathVariable Integer examId, @RequestParam Boolean strategy) {
+    public String setExamPoolStrategy(@PathVariable String examId, @RequestParam Boolean strategy) {
         examService.changeExamPoolStrategy(strategy, examService.GetExam(examId));
         return "redirect:/exams";
     }
 
     @GetMapping("/setExamPoolStrategyTrue/{examId}/{count}")
-    public String setExamPoolStrategyTrue(@PathVariable Integer examId, @PathVariable Integer count) {
+    public String setExamPoolStrategyTrue(@PathVariable String examId, @PathVariable Integer count) {
         examService.changeExamPoolStrategy(true, examService.GetExam(examId));
         int pool = examService.setExamPool(count, examService.GetExam(examId));
         return "redirect:/exams";
     }
 
     @PostMapping("/setExamPoolStrategyFalse/{examId}")
-    public String setExamPoolStrategyFalse(@PathVariable Integer examId) {
+    public String setExamPoolStrategyFalse(@PathVariable String examId) {
         examService.changeExamPoolStrategy(false, examService.GetExam(examId));
         return "redirect:/exams";
     }
 
     @GetMapping("/showDoneExamUser/{examId}")
     public ModelAndView
-    showDoneExamUser(@PathVariable Integer examId, Model model) {
-        Exam exam = examService.GetExam(examId.intValue());
-        List<Student> studentopenAnswers = answerOpenService.getAllDistinctStudentsForOpenQuestions(examId.intValue());
+    showDoneExamUser(@PathVariable String examId, Model model) {
+        Exam exam = examService.GetExam(examId);
+        List<Student> studentopenAnswers = answerOpenService.getAllDistinctStudentsForOpenQuestions(examId);
         List<Logstudentexam> list = logstudentexamService.getStudentsLogstudentExamById(exam);
         List<OpenQuestion> openQuestions = openQuestionService.getAllByExamId(examId);
         List<Closedquestion> closedquestions = closedQuestionService.getAllByExamId(examId);
@@ -241,8 +235,8 @@ public class ExamController {
         for (int i = 0; i < studentopenAnswers.size(); i++) {
             map.put(studentopenAnswers.get(i), answerOpenService.getStudentOpenAnswerByStudent(studentopenAnswers.get(i)));
         }
-        HashMap<Integer, LocalTime> mapTime = new HashMap<>();
-        HashMap<Integer, LocalDate> mapDate = new HashMap<>();
+        HashMap<String, LocalTime> mapTime = new HashMap<>();
+        HashMap<String, LocalDate> mapDate = new HashMap<>();
         for (Map.Entry<Student, List<Studentopenanswer>> entry : map.entrySet()) {
             Student student = entry.getKey();
 
@@ -272,7 +266,7 @@ public class ExamController {
     }
 
     @PostMapping("/rate")
-    public ModelAndView rateStudent(@RequestParam Integer examId, @RequestParam Integer studentId, Model model) {
+    public ModelAndView rateStudent(@RequestParam String examId, @RequestParam String studentId, Model model) {
         Exam exam = examService.GetExam(examId);
         Student student = usersService.getStudentByid(studentId);
         List<Studentopenanswer> answerOpen = answerOpenService.getStudentOpenAnswerByStudent(student);
@@ -287,9 +281,9 @@ public class ExamController {
     }
 
     @GetMapping("/evaluateExam")
-    public String evaluateExam(@RequestParam("studentId") Integer studentId, @RequestParam("examId") Integer examId, @RequestParam List<Integer> scores, @RequestParam("examinerComment") String examinerComment, String to) {
-        Student student = usersService.getStudentByid(studentId.intValue());
-        Exam exam = examService.GetExam(examId.intValue());
+    public String evaluateExam(@RequestParam("studentId") String studentId, @RequestParam("examId") String examId, @RequestParam List<Integer> scores, @RequestParam("examinerComment") String examinerComment, String to) {
+        Student student = usersService.getStudentByid(studentId);
+        Exam exam = examService.GetExam(examId);
         logstudentexamService.setDateTimeExaminerComment(student, exam, examinerComment);
         int points = answerOpenService.updateScores(student, scores);
         logstudentexamService.addOpenPoints(student, exam, points);
@@ -302,7 +296,7 @@ public class ExamController {
     }
 
     @GetMapping("/confirmExamDeletion/{examId}")
-    public ModelAndView deleteExam(@PathVariable Integer examId, Model model) {
+    public ModelAndView deleteExam(@PathVariable String examId, Model model) {
 //        boolean deleted = examService.deleteExam(examId);
 //        if (deleted) {
 //            return ResponseEntity.ok("Exam deleted successfully");
@@ -318,11 +312,11 @@ public class ExamController {
     }
 
     @PostMapping("/deleteExam/{examId}")
-    public String deleteExam(@RequestParam Integer examId) {
-        logsService.deleteExam(examId.intValue());
-        openQuestionService.deleteAllOpenQuestionsByExamId(examId.intValue());
-        closedQuestionService.deleteAllClosedQuestionsByExamId(examId.intValue());
-        logstudentexamService.deleteAllLogsForExam(examService.GetExam(examId.intValue()));
+    public String deleteExam(@RequestParam String examId) {
+        logsService.deleteExam(examId);
+        openQuestionService.deleteAllOpenQuestionsByExamId(examId);
+        closedQuestionService.deleteAllClosedQuestionsByExamId(examId);
+        logstudentexamService.deleteAllLogsForExam(examService.GetExam(examId));
         boolean deleted = examService.deleteExam(examId);
 
         return "redirect:/exams";
@@ -333,17 +327,17 @@ public class ExamController {
         ModelAndView modelAndView = new ModelAndView();
         modelAndView.setViewName("examDetails");
 
-        Exam exam = examService.GetExam(Integer.parseInt(examId));
+        Exam exam = examService.GetExam(examId);
 
-        List<Closedquestion> closedquestions = closedQuestionService.getAllByExamId(Integer.parseInt(examId));
-        Map<Integer, List<Answerclosed>> closedQuestionAnswersMap = new HashMap<>();
+        List<Closedquestion> closedquestions = closedQuestionService.getAllByExamId(examId);
+        Map<String, List<Answerclosed>> closedQuestionAnswersMap = new HashMap<>();
         for (Closedquestion closedQuestion : closedquestions) {
             List<Answerclosed> answers = answerClosedService.getAllByQuestionId(closedQuestion.getId());
             closedQuestionAnswersMap.put(closedQuestion.getId(), answers);
         }
-        modelAndView.addObject("exam", examService.GetExam(Integer.parseInt(examId)));
-        modelAndView.addObject("listOpenQuestions", openQuestionService.getAllByExamId(Integer.parseInt(examId)));
-        modelAndView.addObject("countOpenQuestions", openQuestionService.getAllByExamId(Integer.parseInt(examId)).size());
+        modelAndView.addObject("exam", examService.GetExam(examId));
+        modelAndView.addObject("listOpenQuestions", openQuestionService.getAllByExamId(examId));
+        modelAndView.addObject("countOpenQuestions", openQuestionService.getAllByExamId(examId).size());
         modelAndView.addObject("listClosedQuestions", closedquestions);
         modelAndView.addObject("closedQuestionAnswersMap", closedQuestionAnswersMap);
 
@@ -355,7 +349,7 @@ public class ExamController {
         ModelAndView modelAndView = new ModelAndView();
         modelAndView.setViewName("solveExam");
 
-        Exam exam = examService.GetExam(Integer.parseInt(examId));
+        Exam exam = examService.GetExam(examId);
         LocalDate startDate = exam.getStartDate();
         LocalTime startTime = exam.getStartTime();
         LocalDate endDate = exam.getEndDate();
@@ -376,7 +370,7 @@ public class ExamController {
         }
 
         Student student = studentsService.getStudentByLogin(user.getUsername());
-        if (logstudentexamService.existsByExamIdAndStudentId(Integer.parseInt(examId), student.getStudentId())) {
+        if (logstudentexamService.existsByExamIdAndStudentId(examId, student.getStudentId())) {
             modelAndView.setViewName("error/404");
             modelAndView.addObject("message", "You have already taken this exam.");
             return modelAndView;
@@ -399,11 +393,11 @@ public class ExamController {
         } else
             modelAndView.addObject("timeEnds", true);
 
-        List<OpenQuestion> openQuestions = openQuestionService.getAllByExamId(Integer.parseInt(examId));
-        List<Closedquestion> closedQuestions = closedQuestionService.getAllByExamId(Integer.parseInt(examId));
+        List<OpenQuestion> openQuestions = openQuestionService.getAllByExamId(examId);
+        List<Closedquestion> closedQuestions = closedQuestionService.getAllByExamId(examId);
 
-        int open_Question_Size = openQuestionService.getAllByExamId(Integer.parseInt(examId)).size();
-        int close_Question_Size = closedQuestionService.getAllByExamId(Integer.parseInt(examId)).size();
+        int open_Question_Size = openQuestionService.getAllByExamId(examId).size();
+        int close_Question_Size = closedQuestionService.getAllByExamId(examId).size();
 
         List<Integer> randomIndexes = generateRandomNumbers(open_Question_Size + close_Question_Size, exam.getQuestionPool());
         List<Integer> openQuestionIndexes = selectNumbersInRange(randomIndexes, 0, open_Question_Size - 1);
@@ -423,7 +417,7 @@ public class ExamController {
             randomClosedQuestions.add(closedQuestions.get(index));
         }
 
-        modelAndView.addObject("exam", examService.GetExam(Integer.parseInt(examId)));
+        modelAndView.addObject("exam", examService.GetExam(examId));
         //modelAndView.addObject("listOpenQuestions", openQuestionService.getAllByExamId(Integer.parseInt(examId)));
         modelAndView.addObject("listOpenQuestions", randomOpenQuestions);
 
@@ -492,7 +486,7 @@ public class ExamController {
 
     }
 
-    private void resultsClosedAnswers(Integer score, int id, Integer questionid) {
+    private void resultsClosedAnswers(Integer score, String id, String questionid) {
         int result = 0;
         //  System.out.println(score);
         List<Answerclosed> Answers = answerClosedService.getAllByQuestionId(questionid);
@@ -514,7 +508,7 @@ public class ExamController {
         }
     }
 
-    private boolean processClosedAnswers(Map<String, String[]> closedAnswers, UserDetails userDetails, Integer currentlogsstudentexam) {
+    private boolean processClosedAnswers(Map<String, String[]> closedAnswers, UserDetails userDetails, String currentlogsstudentexam) {
         Student student = studentsService.getStudentByLogin(userDetails.getUsername());
         if (student == null) {
             return false;
@@ -525,7 +519,7 @@ public class ExamController {
 
 
         for (Map.Entry<String, String[]> entry : closedAnswers.entrySet()) {
-            Integer questionId = Integer.parseInt(entry.getKey());
+            String questionId = entry.getKey();
             Closedquestion closedQuestion = closedQuestionService.getClosedQuestionById(questionId);
             Integer questionresult = 0;
             for (String answerId : entry.getValue()) {
@@ -575,7 +569,7 @@ public class ExamController {
 
         Student student = studentsService.getStudentByLogin(user.getUsername());
         Exam currentExam = examService.GetExam(examResponse.getExamId());
-        Integer logstudentexamid = logstudentexamService.createAndSaveLogstudentexam(currentExam, student);
+        String logstudentexamid = logstudentexamService.createAndSaveLogstudentexam(currentExam, student);
         boolean openAnswersSaved = processOpenAnswers(examResponse.getOpenAnswers(), user);
         boolean closedAnswersSaved = processClosedAnswers(examResponse.getClosedAnswers(), user, logstudentexamid);
         if (!openAnswersSaved || !closedAnswersSaved) {
@@ -602,7 +596,7 @@ public class ExamController {
                               @RequestParam(required = false) List<String> closedanswer,
                               @RequestParam(required = false) List<String> correctness,
                               @RequestParam(value = "type", required = false) String type,
-                              @PathVariable Integer examId, Model model) {
+                              @PathVariable String examId, Model model) {
         if (result.hasErrors()) {
             Map<String, String> fieldErrors = new HashMap<>();
             result.getAllErrors().forEach(error -> {
@@ -618,7 +612,7 @@ public class ExamController {
 
         Exam exam = examService.GetExam(examId);
         if ("closed".equals(type)) {
-            logsService.addClosedQuestionToExam(examId.intValue(), closedquestion);
+            logsService.addClosedQuestionToExam(examId, closedquestion);
             closedquestion.setExam(exam);
             closedQuestionService.addClosedQuestion(closedquestion);
             for (int i = 0; i < closedanswer.size(); i++) {
@@ -631,7 +625,7 @@ public class ExamController {
             }
 
         } else {
-            logsService.addOpenQuestionToExam(examId.intValue(), openQuestion);
+            logsService.addOpenQuestionToExam(examId, openQuestion);
             openQuestion.setExam(exam);
             openQuestionService.AddOpenQuestion(openQuestion);
         }
@@ -639,7 +633,7 @@ public class ExamController {
     }
 
     @GetMapping("/addStudents/{examId}")
-    public ModelAndView addStudents(@PathVariable Integer examId) {
+    public ModelAndView addStudents(@PathVariable String examId) {
         ModelAndView modelAndView = new ModelAndView();
 
         Exam exam = this.examService.GetExam(examId);
@@ -661,9 +655,9 @@ public class ExamController {
     }
 
     @PostMapping("/addSingleStudent")
-    public String addSingleStudent(@RequestParam("examId") String examId, @RequestParam("studentId") Integer studentId) {
+    public String addSingleStudent(@RequestParam("examId") String examId, @RequestParam("studentId") String studentId) {
         try {
-            int parsedExamId = Integer.parseInt(examId);
+            String parsedExamId = examId;
             System.out.println("addSingleStudent - examId: " + parsedExamId + ", studentId: " + studentId);
             Exam exam = this.examService.GetExam(parsedExamId);
             Student student = this.studentsService.getStudentById(studentId);
@@ -681,9 +675,9 @@ public class ExamController {
     }
 
     @PostMapping("/addStudentsFromGroup")
-    public String addStudentsFromGroup(@RequestParam("examId") String examId, @RequestParam("groupId") Integer groupId) {
+    public String addStudentsFromGroup(@RequestParam("examId") String examId, @RequestParam("groupId") String groupId) {
         try {
-            int parsedExamId = Integer.parseInt(examId);
+            String parsedExamId = examId;
             System.out.println("addStudentsFromGroup - examId: " + parsedExamId + ", groupId: " + groupId);
             Exam exam = this.examService.GetExam(parsedExamId);
             Group group = this.groupsService.getGroupByGroupId(groupId);
@@ -712,7 +706,7 @@ public class ExamController {
             user = (CustomUserDetails) session.getAttribute("UserDetails");
         }
 
-        Integer examId = Integer.parseInt(action.substring(action.indexOf(':') + 1));
+        String examId = action.substring(action.indexOf(':') + 1);
 
         if (action.startsWith("solveExam:")) {
             if (examService.hasUserAlreadySolvedExam(user.getUserId(), examId)) {
@@ -743,7 +737,7 @@ public class ExamController {
     }
 
     @GetMapping("/toggleVisibility/{examId}")
-    public String toggleExamVisibility(@PathVariable Integer examId) {
+    public String toggleExamVisibility(@PathVariable String examId) {
         examService.changeExamVisibility(examId);
         return "redirect:/exams";
     }

@@ -16,12 +16,14 @@ public class OpenQuestionService {
     private final StudentOpenAnswerService studentOpenAnswerService;
 
     @Autowired
-    public OpenQuestionService(OpenQuestionRepository openQuestionRepository, StudentOpenAnswerService studentOpenAnswerService){
+    public OpenQuestionService(OpenQuestionRepository openQuestionRepository,
+                               StudentOpenAnswerService studentOpenAnswerService){
         this.openQuestionRepository = openQuestionRepository;
         this.studentOpenAnswerService = studentOpenAnswerService;
     }
 
     public OpenQuestion UpdateOpenQuestion(OpenQuestion updatedOpenQuestion){
+        // openQuestionId jest Stringiem
         OpenQuestion openQuestion = GetOpenQuestion(updatedOpenQuestion.getOpenQuestionId());
         if(openQuestion != null){
             openQuestion.setContent(updatedOpenQuestion.getContent());
@@ -32,7 +34,8 @@ public class OpenQuestionService {
         return null;
     }
 
-    public OpenQuestion GetOpenQuestion(int questionID){
+    // wcześniej: GetOpenQuestion(int questionID)
+    public OpenQuestion GetOpenQuestion(String questionID){
         Optional<OpenQuestion> existingOpenQuestionOptional = openQuestionRepository.findById(questionID);
         return existingOpenQuestionOptional.orElse(null);
     }
@@ -50,18 +53,17 @@ public class OpenQuestionService {
         return openQuestionRepository.findAll();
     }
 
-    public List<OpenQuestion> getAllByExamId(int examId) {
+    // wcześniej: int examId
+    public List<OpenQuestion> getAllByExamId(String examId) {
         return openQuestionRepository.findByExamId(examId);
     }
 
     public OpenQuestion getOpenQuestionById(String questionId) {
-        int id = Integer.parseInt(questionId);
-        return openQuestionRepository.findById(id).orElse(null);
+        return openQuestionRepository.findById(questionId).orElse(null);
     }
 
-
     @Transactional
-    public boolean deleteOpenQuestion(Integer questionID) {
+    public boolean deleteOpenQuestion(String questionID) {
         if (openQuestionRepository.existsById(questionID)) {
             openQuestionRepository.deleteById(questionID);
             return true;
@@ -70,7 +72,7 @@ public class OpenQuestionService {
     }
 
     @Transactional
-    public void deleteAllOpenQuestionsByExamId(int examId) {
+    public void deleteAllOpenQuestionsByExamId(String examId) {
         List<OpenQuestion> questions = openQuestionRepository.findByExamId(examId);
         for (OpenQuestion question : questions) {
             studentOpenAnswerService.deleteAllAnswersByQuestionId(question.getOpenQuestionId());

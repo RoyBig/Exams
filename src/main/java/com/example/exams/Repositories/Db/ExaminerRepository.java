@@ -1,22 +1,21 @@
 package com.example.exams.Repositories.Db;
 
 import com.example.exams.Model.Data.db.Examiner;
-import com.example.exams.Model.Data.db.Student;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
+import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.Optional;
 
 @Repository
-public interface ExaminerRepository extends JpaRepository<Examiner, Integer> {
-    Examiner findExaminerByLogin(String login);
-    Examiner findByLogin(String login);
-    Examiner findExaminerByLoginAndEmail(String login, String email);
-    @Query("SELECT e FROM Examiner e WHERE e.examiner_id = :id")
-    Examiner findExaminerById(@Param("id") Integer id);
+public interface ExaminerRepository extends MongoRepository<Examiner, String> {
 
-    List<Examiner> findAll();
+    Examiner findExaminerByLogin(String login);
+
+    Examiner findByLogin(String login);
+
+    Examiner findExaminerByLoginAndEmail(String login, String email);
+
+    @Query("{ 'examiner_id': ?0 }")
+    Examiner findExaminerById(String id);
 }

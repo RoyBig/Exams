@@ -111,10 +111,12 @@ public class Controller {
         CustomUserDetails customUserDetails = (CustomUserDetails) session.getAttribute("UserDetails");
         if (session.getAttribute(customUserDetails.getUsername()+"_visited") == null) {
             Servicestatistic servicestatistic = logsService.getServiceStatistic();
-            int visitorscount = servicestatistic.getVisitorscount() + 1;
-            servicestatistic.setVisitorscount(visitorscount);
-            logsService.updateServicestatistic(servicestatistic);
-            session.setAttribute(customUserDetails.getUsername()+"_visited", true);
+            if(servicestatistic != null){
+                int visitorscount = servicestatistic.getVisitorscount() + 1;
+                servicestatistic.setVisitorscount(visitorscount);
+                logsService.updateServicestatistic(servicestatistic);
+                session.setAttribute(customUserDetails.getUsername()+"_visited", true);
+            }
         }
 
         ModelAndView modelAndView = new ModelAndView();

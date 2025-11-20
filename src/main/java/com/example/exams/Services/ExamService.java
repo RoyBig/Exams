@@ -42,7 +42,13 @@ public class ExamService {
     private final StudentclosedanswerRepository studentclosedanswerRepository;
 
     @Autowired
-    public ExamService(ExamRepository examRepository, StudentsEntityRepository studentsRepository, SubjectService subjectService, ExaminerService examinerService, OpenQuestionService openQuestionService, HttpSession httpSession, ClosedQuestionService closedQuestionService,
+    public ExamService(ExamRepository examRepository,
+                       StudentsEntityRepository studentsRepository,
+                       SubjectService subjectService,
+                       ExaminerService examinerService,
+                       OpenQuestionService openQuestionService,
+                       HttpSession httpSession,
+                       ClosedQuestionService closedQuestionService,
                        StudentclosedanswerRepository studentclosedanswerRepository) {
         this.examRepository = examRepository;
         this.studentsRepository = studentsRepository;
@@ -62,7 +68,7 @@ public class ExamService {
         return examRepository.findAll();
     }
 
-    public Exam GetExam(int id) {
+    public Exam GetExam(String id) {
         Optional<Exam> exam = examRepository.findById(id);
         return exam.orElse(null);
     }
@@ -71,7 +77,7 @@ public class ExamService {
         examRepository.save(updatedExam);
     }
 
-    public boolean deleteExam(Integer examId) {
+    public boolean deleteExam(String examId) {
         Optional<Exam> examOptional = examRepository.findById(examId);
         if (examOptional.isPresent()) {
             examRepository.delete(examOptional.get());
@@ -91,7 +97,10 @@ public class ExamService {
         exam.setEndDate(examDTO.getEndDate());
         exam.setEndTime(examDTO.getEndTime());
         if(exam.getStartDate()!=null && exam.getEndDate()!=null && exam.getStartTime()!=null && exam.getEndTime()!=null) {
-            exam.setDuration(Duration.between(LocalDateTime.of(exam.getStartDate(), exam.getStartTime()), LocalDateTime.of(exam.getEndDate(), exam.getEndTime())).toMinutes());
+            exam.setDuration(Duration.between(
+                    LocalDateTime.of(exam.getStartDate(), exam.getStartTime()),
+                    LocalDateTime.of(exam.getEndDate(), exam.getEndTime())
+            ).toMinutes());
         }
         exam.setQuestionPoolStrategy(false);
         exam.setQuestionPool(0);
@@ -173,6 +182,7 @@ public class ExamService {
         else return s;
 
     }
+
     public List<Exam> getUserExams() {
         CustomUserDetails loggedUser = (CustomUserDetails) httpSession.getAttribute("UserDetails");
 
@@ -183,7 +193,7 @@ public class ExamService {
                 return this.examRepository.findAll();
             } else if (authorities.stream().anyMatch(authority -> authority.getAuthority().equals("ROLE_STUDENT"))) {
                 Student student = studentsRepository.findById(loggedUser.getUserId()).orElse(null);
-                if (student != null) {
+                if (student != null && student.getExams() != null) {
                     return student.getExams().stream()
                             .filter(Exam::getVisibility)
                             .collect(Collectors.toList());
@@ -191,8 +201,7 @@ public class ExamService {
             }
         }
 
-        return null;
-
+        return List.of();
     }
 
     public List<Exam> searchExams(String searchQuery, List<Exam> allExams) {
@@ -204,6 +213,7 @@ public class ExamService {
 
         return matchingExams;
     }
+
     public List<Exam> getExamsDependsOnDates(LocalDate startDate, LocalDate endDate, List<Exam> allExams) {
 
         List<Exam> examsBetweenDates;
@@ -253,15 +263,20 @@ public class ExamService {
         }
         return exams;
     }
+
     public void changeExamPoolStrategy(boolean poolStrategy, Exam exam){
         if(exam.getQuestionPoolStrategy() != poolStrategy) {
             exam.setQuestionPoolStrategy(poolStrategy);
             if (!poolStrategy) {
-                exam.setQuestionPool(openQuestionService.getAllByExamId(exam.getId()).size() + closedQuestionService.getAllByExamId(exam.getId()).size());
+                exam.setQuestionPool(
+                        openQuestionService.getAllByExamId(exam.getId()).size()
+                                + closedQuestionService.getAllByExamId(exam.getId()).size()
+                );
             }
             examRepository.save(exam);
         }
     }
+
     public int setExamPool(int count, Exam exam){
         if(exam.getQuestionPoolStrategy()){
             exam.setQuestionPool(count);
@@ -270,14 +285,15 @@ public class ExamService {
         return exam.getQuestionPool();
     }
 
-    public void changeExamVisibility(int Id){
+    public void changeExamVisibility(String Id){
         Exam exam = GetExam(Id);
         if(exam != null){
             exam.setVisibility(!exam.getVisibility());
             examRepository.save(exam);
         }
     }
-    public int getQuestionsQuantity(int id){
+
+    public int getQuestionsQuantity(String id){
         try {
             Exam exam = GetExam(id);
             if (exam != null) {
@@ -297,15 +313,11 @@ public class ExamService {
 
     }
 
-    public boolean hasUserAlreadySolvedExam(Integer userId, Integer examId) {
+    public boolean hasUserAlreadySolvedExam(String userId, String examId) {
 
         List<Studentclosedanswer> studentclosedanswers = studentclosedanswerRepository
-                                  .findAllByAnswerclosedAnswerid_ClosedquestionQuestionid_Exam_Id_AndStudentStudent_StudentId(examId, userId);
+                .findAllByAnswerclosedAnswerid_ClosedquestionQuestionid_Exam_Id_AndStudentStudent_StudentId(examId, userId);
 
         return studentclosedanswers.isEmpty();
     }
-
-
-
-
 }

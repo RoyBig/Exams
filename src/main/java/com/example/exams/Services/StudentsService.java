@@ -10,6 +10,7 @@ import java.util.List;
 
 @Service
 public class StudentsService {
+
     @Autowired
     StudentsEntityRepository studentsRepository;
 
@@ -17,7 +18,7 @@ public class StudentsService {
         return studentsRepository.findAll();
     }
 
-    public Student getStudentById(Integer studentId){
+    public Student getStudentById(String studentId){
         return studentsRepository.findStudentByStudentId(studentId);
     }
 
@@ -25,10 +26,10 @@ public class StudentsService {
         return studentsRepository.findStudentByLoginAndEmail(login, email);
     }
 
-    public List<Student> getStudentsByIds(List<Integer> studentIds) {
+    public List<Student> getStudentsByIds(List<String> studentIds) {
         List<Student> students = new ArrayList<>();
 
-        for (Integer studentId : studentIds) {
+        for (String studentId : studentIds) {
             Student student = getStudentById(studentId);
             if (student != null) {
                 students.add(student);
@@ -42,7 +43,8 @@ public class StudentsService {
         return studentsRepository.findStudentByLogin(login);
     }
 
-    public void editStudent(Integer studentId, String firstName, String lastName, String login, String password, String email){
+    public void editStudent(String studentId, String firstName, String lastName,
+                            String login, String password, String email){
         Student student = studentsRepository.findStudentByStudentId(studentId);
 
         if(student != null){
@@ -61,12 +63,11 @@ public class StudentsService {
             if(email != null && !email.trim().isEmpty())
                 student.setEmail(email);
 
-
             studentsRepository.save(student);
         }
     }
 
-    public void deleteStudent(int id){
+    public void deleteStudent(String id){
         studentsRepository.deleteById(id);
     }
 }

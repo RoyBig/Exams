@@ -12,6 +12,7 @@ import java.util.List;
 
 @Service
 public class ClosedQuestionService {
+
     private final ClosedQuestionRepository closedQuestionRepository;
     private final StudentclosedanswerRepository studentclosedanswerRepository;
     private final StudentClosedAnswerService studentClosedAnswerService;
@@ -19,46 +20,44 @@ public class ClosedQuestionService {
 
     @Autowired
     public ClosedQuestionService(ClosedQuestionRepository closedQuestionRepository,
-                                 StudentclosedanswerRepository studentclosedanswerRepository, StudentClosedAnswerService studentClosedAnswerService,
-                                 AnswerClosedService answerClosedService){
+                                 StudentclosedanswerRepository studentclosedanswerRepository,
+                                 StudentClosedAnswerService studentClosedAnswerService,
+                                 AnswerClosedService answerClosedService) {
         this.closedQuestionRepository = closedQuestionRepository;
         this.studentclosedanswerRepository = studentclosedanswerRepository;
         this.studentClosedAnswerService = studentClosedAnswerService;
         this.answerClosedService = answerClosedService;
     }
-    public List<Closedquestion> getAllByExamId(int examId) {
+
+    public List<Closedquestion> getAllByExamId(String examId) {
         return closedQuestionRepository.findByExamId(examId);
     }
 
-    public Closedquestion addClosedQuestion(Closedquestion newClosedQuestion)
-    {
+    public Closedquestion addClosedQuestion(Closedquestion newClosedQuestion) {
         Exam exam = newClosedQuestion.getExam();
         Closedquestion closedquestion = closedQuestionRepository.save(newClosedQuestion);
-        if(!exam.getQuestionPoolStrategy()){
+        if (!exam.getQuestionPoolStrategy()) {
             exam.setQuestionPool(exam.getQuestionPool() + 1);
         }
         return closedquestion;
     }
+
     @Transactional
     public Closedquestion save(Closedquestion closedQuestion) {
         return closedQuestionRepository.save(closedQuestion);
     }
 
-
-    public Closedquestion getClosedQuestionById(Integer questionId) {
+    public Closedquestion getClosedQuestionById(String questionId) {
         return closedQuestionRepository.findById(questionId).orElse(null);
     }
 
-    public void deleteClosedQuestion(Integer questionId) {
+    public void deleteClosedQuestion(String questionId) {
         closedQuestionRepository.deleteById(questionId);
     }
 
-
-
-    public void deleteAllClosedQuestionsByExamId(int examId) {
+    public void deleteAllClosedQuestionsByExamId(String examId) {
         List<Closedquestion> questions = closedQuestionRepository.findByExamId(examId);
         for (Closedquestion question : questions) {
-
             studentClosedAnswerService.deleteStudentClosedAnswersByQuestionId(question.getId());
             answerClosedService.deleteAnswersByQuestionId(question.getId());
             closedQuestionRepository.deleteById(question.getId());

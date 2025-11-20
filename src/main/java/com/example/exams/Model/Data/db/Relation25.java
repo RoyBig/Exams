@@ -1,25 +1,25 @@
 package com.example.exams.Model.Data.db;
 
-import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.DBRef;
+import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 @Getter
 @Setter
-@Entity
-@Table(name = "relation_25")
+@Document(collection = "relation_25")
 public class Relation25 {
-    @EmbeddedId
-    private Relation25Id id;
 
-    @MapsId("subjectSubjectid")
-    @ManyToOne(fetch = FetchType.EAGER, optional = false)
-    @JoinColumn(name = "subject_subjectid", nullable = false)
+    @Id
+    private String id;
+
+    @DBRef
+    @Field(name = "subject_subjectid")
     private Subject subjectSubjectid;
 
-    @MapsId("groupClassid")
-    @ManyToOne(fetch = FetchType.EAGER, optional = false)
-    @JoinColumn(name = "group_classid", nullable = false)
+    @DBRef
+    @Field(name = "group_classid")
     private Group groupClassid;
-
 }

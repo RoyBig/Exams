@@ -2,49 +2,45 @@ package com.example.exams.Model.Data.db;
 
 import com.example.exams.Model.Data.ProperDataModels.ProblemCategories;
 import com.example.exams.Model.Data.ProperDataModels.ProblemStatus;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.DBRef;
+import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 @Getter
 @Setter
-@Entity
-@Table(name = "problem")
+@Document(collection = "problem")
 @AllArgsConstructor
 @NoArgsConstructor
 public class Problem {
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Id
-    @Column(name = "problemid", nullable = false)
-    private Integer id;
 
-    @Column(name = "photo", columnDefinition = "LONGBLOB")
+    @Id
+    private String id;
+
+    @Field(name = "photo")
     private byte[] photo;
 
-    @Column(name = "description", length = 100)
+    @Field(name = "description")
     private String description;
 
-    @JsonIgnore
-    @ManyToOne(fetch = FetchType.EAGER)
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    @JoinColumn(name = "problems_student_id")
+    @DBRef
+    @Field(name = "problems_student")
     private Student problemsStudent;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "problems_examiner_id")
+    @DBRef
+    @Field(name = "problems_examiner")
     private Examiner problemsExaminer;
 
-    @Column(name = "category")
+    @Field(name = "category")
     private ProblemCategories category;
 
-    @Column(name = "username", length = 20)
+    @Field(name = "username")
     private String username;
 
-    @Column(name = "status")
+    @Field(name = "status")
     private ProblemStatus status = ProblemStatus.New;
 }

@@ -14,5 +14,18 @@ services:
     volumes:
       - relational-exams-db:/var/lib/mysql
 
+  no-relational-exams-db:
+    image: mongo:latest
+    container_name: no-relational-exams-db
+    ports:
+      - "27017:27017"
+    volumes:
+      - no-relational-exams-db:/data/db
+    environment:
+      MONGO_INITDB_DATABASE: exams_database
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: admin
+
 volumes:
   relational-exams-db:
+  no-relational-exams-db:

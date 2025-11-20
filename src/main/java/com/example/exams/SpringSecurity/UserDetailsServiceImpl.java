@@ -60,9 +60,9 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         UserDetails userDetails = null;
 
         if (administrator != null && administrator.isVerificationStatus()) {
-            userDetails = buildUserDetails(administrator.getAdministrator_id(), administrator.getLogin(), administrator.getPassword(), Collections.singleton("ADMIN"));
+            userDetails = buildUserDetails(administrator.getAdministratorId(), administrator.getLogin(), administrator.getPassword(), Collections.singleton("ADMIN"));
         } else if (examiner != null && examiner.isVerificationStatus()) {
-            userDetails = buildUserDetails(examiner.getExaminer_id(), examiner.getLogin(), examiner.getPassword(), Collections.singleton("EXAMINER"));
+            userDetails = buildUserDetails(examiner.getExaminerId(), examiner.getLogin(), examiner.getPassword(), Collections.singleton("EXAMINER"));
         } else if (student != null) {
             userDetails = buildUserDetails(student.getStudentId(), student.getLogin(), student.getPassword(), Collections.singleton("STUDENT"));
         }
@@ -75,11 +75,14 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         if (userDetails == null) {
             throw new UsernameNotFoundException("User " + username + " not found or not verified!");
         }
+        System.out.println(userDetails.getUsername());
+        System.out.println(userDetails.getPassword());
+        System.out.println(userDetails.getAuthorities());
 
         return userDetails;
     }
 
-    private UserDetails buildUserDetails(Integer userId, String username, String password, Set<String> roles) {
+    private UserDetails buildUserDetails(String userId, String username, String password, Set<String> roles) {
         return new CustomUserDetails(userId, username, password, roles.stream().map(role -> new SimpleGrantedAuthority("ROLE_" + role)).collect(Collectors.toList()));
 
     }

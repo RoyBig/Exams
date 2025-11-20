@@ -1,17 +1,14 @@
 package com.example.exams.Repositories.Db;
 
 import com.example.exams.Model.Data.db.Administrator;
-import com.example.exams.Model.Data.db.Examiner;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
+import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.data.mongodb.repository.Query;
 
-public interface AdministratorsEntityRepository extends JpaRepository<Administrator, Integer> {
+public interface AdministratorsEntityRepository extends MongoRepository<Administrator, String> {
+    @Query("{ 'login' : ?0 }")
     Administrator findAdministratorByLogin(String login);
+    @Query("{ 'login' : ?0, 'email' : ?1 }")
     Administrator findAdministratorByLoginAndEmail(String login, String email);
-    @Query("SELECT a FROM Administrator a WHERE a.administrator_id = :id")
-    Administrator findAdministratorById(@Param("id") Integer id);
-
-
-
+    @Query("{ 'administratorId' : ?0 }")
+    Administrator findAdministratorById(String id);
 }

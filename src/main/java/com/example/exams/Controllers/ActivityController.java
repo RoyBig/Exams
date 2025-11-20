@@ -39,25 +39,25 @@ public class ActivityController {
     }
 
     @PostMapping("/examiner/activate/{id}")
-    public String activateExaminer(@PathVariable int id) {
+    public String activateExaminer(@PathVariable String id) {
         examinerService.activate(id);
         return "redirect:/activity";
     }
 
     @PostMapping("/examiner/deactivate/{id}")
-    public String deactivateExaminer(@PathVariable int id) {
+    public String deactivateExaminer(@PathVariable String id) {
         examinerService.deactivate(id);
         return "redirect:/activity";
     }
 
     @PostMapping("/administrator/activate/{id}")
-    public String activateAdministrator(@PathVariable int id) {
+    public String activateAdministrator(@PathVariable String id) {
         administartorService.activate(id);
         return "redirect:/activity";
     }
 
     @PostMapping("/administrator/deactivate/{id}")
-    public String deactivateAdministrator(@PathVariable int id) {
+    public String deactivateAdministrator(@PathVariable String id) {
         administartorService.deactivate(id);
         return "redirect:/activity";
     }

@@ -15,13 +15,11 @@ public class StudentClosedAnswerService {
         studentClosedAnswerRepository.save(closedAnswer);
     }
 
-    public void deleteStudentClosedAnswersByQuestionId(int questionId) {
+    public void deleteStudentClosedAnswersByQuestionId(String questionId) {
         studentClosedAnswerRepository.deleteByQuestionId(questionId);
     }
 
-    public void deleteStudentClosedAnswerByAnswerId(int answerId) {
+    public void deleteStudentClosedAnswerByAnswerId(String answerId) {
         studentClosedAnswerRepository.deleteByAnswerId(answerId);
     }
-
-
 }

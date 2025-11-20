@@ -7,7 +7,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class ShowProblem {
-    private int id;
+    private String id;
     private String description;
     private String photo;
     private String category;

@@ -1,65 +1,68 @@
 package com.example.exams.Model.Data.db;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.DBRef;
+import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.DocumentReference;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.util.List;
 
 @Getter
 @Setter
-@Entity
+@Document(collection = "student")
 @AllArgsConstructor
-@Table(name = "student")
 public class Student {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "student_id", nullable = false)
-    private Integer studentId;
 
-    @ManyToMany(mappedBy = "students", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @Id
+    private String studentId;
+
+    @DBRef
+    @Field(name = "groups")
     private List<Group> groups;
 
-    @JsonIgnore
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    @ManyToMany(mappedBy = "students", fetch = FetchType.EAGER)
+    @DBRef
+    @Field(name = "exams")
+    @DocumentReference(lookup = "{ 'students.$id' : ?#{#self._id} }")
     private List<Exam> exams;
 
-    @Column(name = "firstname", nullable = false, length = 20)
+    @Field(name = "firstname")
     private String firstname;
 
-    @Column(name = "lastname", length = 20)
+    @Field(name = "lastname")
     private String lastname;
 
-    @Column(name = "login", length = 20)
+    @Field(name = "login")
     private String login;
 
-    @Column(name = "password", length = 20)
+    @Field(name = "password")
     private String password;
 
-    @Column(name = "email", length = 40)
+    @Field(name = "email")
     private String email;
 
-    @OneToMany(mappedBy = "problemsStudent",fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @DBRef
+    @Field(name = "problems")
     private List<Problem> problems;
 
-    @OneToMany(mappedBy = "studentStudent",fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @DBRef
+    @Field(name = "studentopenanswers")
     private List<Studentopenanswer> studentopenanswers;
 
-    @OneToMany(mappedBy = "studentStudent",fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @DBRef
+    @Field(name = "studentclosedanswer")
     private List<Studentclosedanswer> studentclosedanswer;
 
-    @OneToMany(mappedBy = "studentStudent",fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @DBRef
+    @Field(name = "logstudentexam")
     private List<Logstudentexam> logstudentexam;
 
     public Student() {}
 
-    public Student(Integer studentId, String firstname, String lastname, String login, String password, String email) {
+    public Student(String studentId, String firstname, String lastname, String login, String password, String email) {
         this.studentId = studentId;
         this.firstname = firstname;
         this.lastname = lastname;

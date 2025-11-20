@@ -11,8 +11,9 @@ import java.util.List;
 @Getter
 @Setter
 public class ExamDTO {
+
     @JsonProperty("subject_id")
-    private Integer subjectId;
+    private String subjectId;
 
     @JsonProperty("description")
     private String description;
@@ -33,8 +34,8 @@ public class ExamDTO {
     private List<OpenQuestionDTO> questions;
 
     @JsonProperty("egzaminator")
-    private Integer egzamiantor;
+    private String egzamiantor;
 
     @JsonProperty("administrator")
-    private Integer administator;
+    private String administator;
 }

@@ -7,7 +7,6 @@ import com.example.exams.SpringSecurity.CustomUserDetails;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -29,7 +28,10 @@ public class LogsService {
     @Autowired
     ClosedQuestionService closedQuestionService;
 
-    public LogsService(LogRepository logRepository, UsersService usersService,ExamService examService, OpenQuestionService openQuestionService,ServicestatisticRepository servicestatisticRepository,ClosedQuestionService closedQuestionService){
+    public LogsService(LogRepository logRepository, UsersService usersService,
+                       ExamService examService, OpenQuestionService openQuestionService,
+                       ServicestatisticRepository servicestatisticRepository,
+                       ClosedQuestionService closedQuestionService) {
         this.logRepository = logRepository;
         this.usersService = usersService;
         this.examService = examService;
@@ -37,66 +39,72 @@ public class LogsService {
         this.servicestatisticRepository = servicestatisticRepository;
         this.closedQuestionService = closedQuestionService;
     }
-    public List<Log> getLogs(){
+
+    public List<Log> getLogs() {
         return logRepository.findAll();
     }
-    public void addLog(Log log){
+
+    public void addLog(Log log) {
         logRepository.save(log);
     }
 
-    public Servicestatistic getServiceStatistic(){
-        return servicestatisticRepository.getServicestatisticById(1);
+    public Servicestatistic getServiceStatistic() {
+        return servicestatisticRepository.findAll().get(0);
     }
-    public void updateServicestatistic (Servicestatistic servicestatistic){
+
+    public void updateServicestatistic(Servicestatistic servicestatistic) {
         servicestatisticRepository.save(servicestatistic);
     }
 
-    public void updateOpenQuestion(OpenQuestion changedOpenQuestion, int openquestionId){
+    public void updateOpenQuestion(OpenQuestion changedOpenQuestion, String openquestionId) {
         OpenQuestion currentOpenQuestion = openQuestionService.GetOpenQuestion(openquestionId);
-        String s="Zmiany w otwartym pytaniu o id: "+openquestionId+" zostały dokonane przez "+whoIsLogged()+". "+"Zmiana nastąpiła w: ";
+        String s = "Zmiany w otwartym pytaniu o id: " + openquestionId + " zostały dokonane przez " + whoIsLogged() + ". " + "Zmiana nastąpiła w: ";
         int length = s.length();
-        if(!changedOpenQuestion.getContent().equals(currentOpenQuestion.getContent())){
-            s= s+ "Treści pytania - "+currentOpenQuestion.getContent()+" --> "+changedOpenQuestion.getContent();
+        if (!changedOpenQuestion.getContent().equals(currentOpenQuestion.getContent())) {
+            s = s + "Treści pytania - " + currentOpenQuestion.getContent() + " --> " + changedOpenQuestion.getContent();
         }
-        if(changedOpenQuestion.getScore() != currentOpenQuestion.getScore()){
-            if(s.length()!= length) s=s+", ";
-            s= s+ "Punktacji pytania - "+currentOpenQuestion.getScore()+" --> "+changedOpenQuestion.getScore();
+        if (changedOpenQuestion.getScore() != currentOpenQuestion.getScore()) {
+            if (s.length() != length) s = s + ", ";
+            s = s + "Punktacji pytania - " + currentOpenQuestion.getScore() + " --> " + changedOpenQuestion.getScore();
         }
-        if(length != s.length()) addLog(new Log(s));
+        if (length != s.length()) addLog(new Log(s));
     }
-    public void deleteOpenQuestion(int openQuestionId){
+
+    public void deleteOpenQuestion(String openQuestionId) {
         OpenQuestion openQuestion = openQuestionService.GetOpenQuestion(openQuestionId);
-        String s= "Otwarte pytanie o id: "+openQuestionId+" i tresci: "+openQuestion.getContent()+" zostało usunięte przez "+whoIsLogged();
+        String s = "Otwarte pytanie o id: " + openQuestionId + " i tresci: " + openQuestion.getContent() + " zostało usunięte przez " + whoIsLogged();
         addLog(new Log(s));
     }
-    public void deleteClosedQuestion(int closedQuestionId){
+
+    public void deleteClosedQuestion(String closedQuestionId) {
         Closedquestion closedquestion = closedQuestionService.getClosedQuestionById(closedQuestionId);
-        String s= "Zamkniete pytanie o id: "+closedQuestionId+" i tresci: "+closedquestion.getContent()+" zostało usunięte przez "+whoIsLogged();
+        String s = "Zamkniete pytanie o id: " + closedQuestionId + " i tresci: " + closedquestion.getContent() + " zostało usunięte przez " + whoIsLogged();
         addLog(new Log(s));
     }
 
-
-    public void updateExam(Exam exam,String s){
-        s= "Zmiany w egzaminie o id: "+exam.getId()+" zostały dokonane przez "+whoIsLogged()+". "+s;
-        addLog(new Log(s));
-    }
-    public void addOpenQuestionToExam(int examId, OpenQuestion openQuestion){
-        String s = "Do egzaminu o id: "+examId+" zostało dodane otwarte pytanie o tresci: "+openQuestion.getContent()+ " przez "+whoIsLogged();
-        addLog(new Log(s));
-    }
-    public void addClosedQuestionToExam(int examId, Closedquestion closedquestion){
-        String s = "Do egzaminu o id: "+examId+" zostało dodane zamkniete pytanie o tresci: "+closedquestion.getContent()+ " przez "+whoIsLogged();
+    public void updateExam(Exam exam, String s) {
+        s = "Zmiany w egzaminie o id: " + exam.getId() + " zostały dokonane przez " + whoIsLogged() + ". " + s;
         addLog(new Log(s));
     }
 
-    public void deleteExam(int examId){
+    public void addOpenQuestionToExam(String examId, OpenQuestion openQuestion) {
+        String s = "Do egzaminu o id: " + examId + " zostało dodane otwarte pytanie o tresci: " + openQuestion.getContent() + " przez " + whoIsLogged();
+        addLog(new Log(s));
+    }
+
+    public void addClosedQuestionToExam(String examId, Closedquestion closedquestion) {
+        String s = "Do egzaminu o id: " + examId + " zostało dodane zamkniete pytanie o tresci: " + closedquestion.getContent() + " przez " + whoIsLogged();
+        addLog(new Log(s));
+    }
+
+    public void deleteExam(String examId) {
         Exam exam = examService.GetExam(examId);
-        String s= "Egzamin o id: "+exam.getId()+" został usunięty przez "+whoIsLogged();
-        if(s!="") addLog(new Log(s));
-
+        String s = "Egzamin o id: " + exam.getId() + " został usunięty przez " + whoIsLogged();
+        if (s != "") addLog(new Log(s));
     }
-    public String whoIsLogged(){
-        String s="";
+
+    public String whoIsLogged() {
+        String s = "";
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
         HttpSession session = request.getSession(false);
         CustomUserDetails user = null;
@@ -105,8 +113,8 @@ public class LogsService {
         }
         Examiner examiner = usersService.getExaminerByLoginAndPassword(user.getUsername());
         Administrator administrator = usersService.getAdministratorByLogin(user.getUsername());
-        if(examiner != null) s= "egzaminatora: "+examiner.getFirstname()+" "+examiner.getLastname();
-        if(administrator != null ) s= "administratora: "+administrator.getFirstname()+" "+administrator.getLastname();
+        if (examiner != null) s = "egzaminatora: " + examiner.getFirstname() + " " + examiner.getLastname();
+        if (administrator != null) s = "administratora: " + administrator.getFirstname() + " " + administrator.getLastname();
         return s;
     }
 }
