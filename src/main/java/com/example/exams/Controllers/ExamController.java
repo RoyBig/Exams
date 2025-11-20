@@ -1,6 +1,5 @@
 package com.example.exams.Controllers;
 
-
 import com.example.exams.Model.Data.ProperDataModels.ExamDTO;
 import com.example.exams.Model.Data.ProperDataModels.ExamResponseDTO;
 import com.example.exams.Model.Data.db.*;
@@ -115,8 +114,6 @@ public class ExamController {
                         .registerModule(new Jdk8Module())
                         .registerModule(new JavaTimeModule());
                 ExamDTO exam = objectMapper.readValue(decodedString, ExamDTO.class);
-                exam.setEgzamiantor(examinerService.findByLogin(authentication.getName()).getExaminerId());
-                exam.setAdministator(administartorService.getAdminByLogin(authentication.getName()).getAdministratorId());
 
                 UserDetails user = null;
                 HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
@@ -129,12 +126,16 @@ public class ExamController {
                 for (GrantedAuthority authority : authorities) {
                     if ("ROLE_EXAMINER".equals(authority.getAuthority())) {
                         Examiner examiner = usersService.getExaminerByLoginAndPassword(user.getUsername());
+                        exam.setEgzamiantor(examinerService.findByLogin(authentication.getName()).getExaminerId());
+                        exam.setAdministator(null);
                         logsService.addLog(new Log("Egzaminator: " + examiner.getFirstname() + " " + examiner.getLastname() + " dodał nowy egzamin o id: " + examService.getNextExamId() + " oraz opisie: " + exam.getDescription()));
                         examService.AddExam(exam);
                         break;
                     }
                     if ("ROLE_ADMIN".equals(authority.getAuthority())) {
                         Administrator administrator = usersService.getAdministratorByLogin(user.getUsername());
+                        exam.setAdministator(administartorService.getAdminByLogin(authentication.getName()).getAdministratorId());
+                        exam.setEgzamiantor(null);
                         logsService.addLog(new Log("Administrator: " + administrator.getFirstname() + " " + administrator.getLastname() + " dodał nowy egzamin o id: " + examService.getNextExamId() + " oraz opisie: " + exam.getDescription()));
                         examService.AddExam(exam);
                         break;
@@ -222,46 +223,57 @@ public class ExamController {
     }
 
     @GetMapping("/showDoneExamUser/{examId}")
-    public ModelAndView
-    showDoneExamUser(@PathVariable String examId, Model model) {
+    public ModelAndView showDoneExamUser(@PathVariable String examId, Model model) {
         Exam exam = examService.GetExam(examId);
-        List<Student> studentopenAnswers = answerOpenService.getAllDistinctStudentsForOpenQuestions(examId);
-        List<Logstudentexam> list = logstudentexamService.getStudentsLogstudentExamById(exam);
-        List<OpenQuestion> openQuestions = openQuestionService.getAllByExamId(examId);
-        List<Closedquestion> closedquestions = closedQuestionService.getAllByExamId(examId);
 
-        HashMap<Student, List<Studentopenanswer>> map = new HashMap<>();
-
-        for (int i = 0; i < studentopenAnswers.size(); i++) {
-            map.put(studentopenAnswers.get(i), answerOpenService.getStudentOpenAnswerByStudent(studentopenAnswers.get(i)));
+        if (exam == null) {
+            ModelAndView errorModelAndView = new ModelAndView();
+            errorModelAndView.setViewName("error"); // Assuming you have an 'error.html' template
+            errorModelAndView.addObject("message", "Exam with ID " + examId + " not found.");
+            return errorModelAndView;
         }
+
+        // Fetch logs first, as they represent completed exams
+        List<Logstudentexam> list = logstudentexamService.getStudentsLogstudentExamById(exam);
+
+        // Get unique students from logs (students who completed the exam)
+        List<Student> students = list.stream()
+                .map(Logstudentexam::getStudentStudent)
+                .filter(Objects::nonNull)
+                .distinct()
+                .sorted(Comparator.comparing(Student::getStudentId))
+                .toList();
+
+        // Build maps for date and time from logs (more reliable than from answers)
         HashMap<String, LocalTime> mapTime = new HashMap<>();
         HashMap<String, LocalDate> mapDate = new HashMap<>();
-        for (Map.Entry<Student, List<Studentopenanswer>> entry : map.entrySet()) {
-            Student student = entry.getKey();
+        for (Logstudentexam log : list) {
+            String studentId = log.getStudentStudent().getStudentId();
+            mapDate.put(studentId, log.getDate());
+            mapTime.put(studentId, log.getTime());
+        }
 
-            LocalDate date = entry.getValue().get(0).getDate();
-            LocalTime time = entry.getValue().get(0).getTime();
-            mapTime.put(student.getStudentId(), time);
-            mapDate.put(student.getStudentId(), date);
-        }
+        // Calculate total possible points
+        List<OpenQuestion> openQuestions = openQuestionService.getAllByExamId(examId);
+        List<Closedquestion> closedquestions = closedQuestionService.getAllByExamId(examId);
         int points = 0;
-        for (int i = 0; i < openQuestions.size(); i++) {
-            points += openQuestions.get(i).getScore();
+        for (OpenQuestion openQuestion : openQuestions) {
+            points += openQuestion.getScore();
         }
-        for (int i = 0; i < closedquestions.size(); i++) {
-            points += closedquestions.get(i).getScore();
+        for (Closedquestion closedquestion : closedquestions) {
+            points += closedquestion.getScore();
         }
 
         ModelAndView modelAndView = new ModelAndView();
         modelAndView.setViewName("showDoneExamUsers");
         modelAndView.addObject("exam", exam);
-        modelAndView.addObject("Students", studentopenAnswers);
+        modelAndView.addObject("Students", students);
         modelAndView.addObject("mapDate", mapDate);
         modelAndView.addObject("mapTime", mapTime);
         modelAndView.addObject("list", list);
-        model.addAttribute("examId", examId);
-        model.addAttribute("points", points);
+        modelAndView.addObject("examId", examId);
+        modelAndView.addObject("points", points);
+
         return modelAndView;
     }
 
@@ -280,12 +292,19 @@ public class ExamController {
         return modelAndView;
     }
 
-    @GetMapping("/evaluateExam")
+    @PostMapping("/evaluateExam")
     public String evaluateExam(@RequestParam("studentId") String studentId, @RequestParam("examId") String examId, @RequestParam List<Integer> scores, @RequestParam("examinerComment") String examinerComment, String to) {
+        System.out.println(studentId);
         Student student = usersService.getStudentByid(studentId);
+        System.out.println(student);
+        if (student == null) {
+            // Handle null student, e.g., log error or redirect
+            return "redirect:/error"; // Or appropriate error page
+        }
         Exam exam = examService.GetExam(examId);
         logstudentexamService.setDateTimeExaminerComment(student, exam, examinerComment);
-        int points = answerOpenService.updateScores(student, scores);
+        List<OpenQuestion> openQuestions = openQuestionService.getAllByExamId(examId);
+        int points = answerOpenService.updateScores(student, scores, openQuestions);
         logstudentexamService.addOpenPoints(student, exam, points);
 
         String sendTo = student.getEmail();
@@ -422,7 +441,7 @@ public class ExamController {
         modelAndView.addObject("listOpenQuestions", randomOpenQuestions);
 
 
-       // List<Closedquestion> listClosedQuestions = closedQuestionService.getAllByExamId(Integer.parseInt(examId));
+        // List<Closedquestion> listClosedQuestions = closedQuestionService.getAllByExamId(Integer.parseInt(examId));
         List<List<Answerclosed>> closedAnswers = new ArrayList<>();
 
 
@@ -581,7 +600,7 @@ public class ExamController {
 
 
     @GetMapping("/addQuestion/{examId}")
-    public ModelAndView addQuestion(@PathVariable Integer examId) {
+    public ModelAndView addQuestion(@PathVariable String examId) {
         ModelAndView modelAndView = new ModelAndView();
         modelAndView.addObject("closedQuestion", new Closedquestion());
         modelAndView.addObject("answerClosed", new Answerclosed());
@@ -638,7 +657,8 @@ public class ExamController {
 
         Exam exam = this.examService.GetExam(examId);
 
-        List<Student> addedStudents = exam.getStudents();
+        List<Student> addedStudents = Optional.ofNullable(exam.getStudents()).orElseGet(ArrayList::new);
+
         List<Group> groups = groupsService.getAllGroups();
         List<Student> allStudents = studentsService.getAllStudents();
 
@@ -655,12 +675,16 @@ public class ExamController {
     }
 
     @PostMapping("/addSingleStudent")
-    public String addSingleStudent(@RequestParam("examId") String examId, @RequestParam("studentId") String studentId) {
+    public String addSingleStudent(@RequestParam("examId") String examId,
+                                   @RequestParam("studentId") String studentId) {
         try {
             String parsedExamId = examId;
-            System.out.println("addSingleStudent - examId: " + parsedExamId + ", studentId: " + studentId);
             Exam exam = this.examService.GetExam(parsedExamId);
             Student student = this.studentsService.getStudentById(studentId);
+
+            if (exam.getStudents() == null) {
+                exam.setStudents(new ArrayList<>());
+            }
 
             if (!exam.getStudents().contains(student)) {
                 exam.getStudents().add(student);
@@ -675,12 +699,16 @@ public class ExamController {
     }
 
     @PostMapping("/addStudentsFromGroup")
-    public String addStudentsFromGroup(@RequestParam("examId") String examId, @RequestParam("groupId") String groupId) {
+    public String addStudentsFromGroup(@RequestParam("examId") String examId,
+                                       @RequestParam("groupId") String groupId) {
         try {
             String parsedExamId = examId;
-            System.out.println("addStudentsFromGroup - examId: " + parsedExamId + ", groupId: " + groupId);
             Exam exam = this.examService.GetExam(parsedExamId);
             Group group = this.groupsService.getGroupByGroupId(groupId);
+
+            if (exam.getStudents() == null) {
+                exam.setStudents(new ArrayList<>());
+            }
 
             List<Student> studentsToAdd = group.getStudents().stream()
                     .filter(student -> !exam.getStudents().contains(student))
@@ -694,7 +722,6 @@ public class ExamController {
             return "redirect:/exams";
         }
     }
-
 
     @PostMapping("/processForm")
     public String processForm(@RequestParam("action") String action, RedirectAttributes redirectAttributes) {

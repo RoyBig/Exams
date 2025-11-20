@@ -1,0 +1,233 @@
+https://dbdiagram.io/d
+
+Table "exams_database.administrator" as Administrator {
+  _id string [pk]
+  firstname string
+  lastname string
+  login string
+  password string
+  email string
+  verification_status bool
+  _class string
+}
+
+Table "exams_database.examiner" as Examiner {
+  _id string [pk]
+  firstname string
+  lastname string
+  login string
+  password string
+  email string
+  verification_status bool
+  _class string
+}
+
+Table "exams_database.student" as Student {
+  _id string [pk]
+  firstname string
+  lastname string
+  login string
+  password string
+  email string
+  _class string
+}
+
+Table "exams_database.group" as Group {
+  _id string [pk]
+  code string
+
+  // [DBRef] tablica: { $ref: "student", $id: ... }
+  students json
+
+  _class string
+}
+
+Table "exams_database.subject" as Subject {
+  _id string [pk]
+  name string
+  _class string
+}
+
+Table "exams_database.exam" as Exam {
+  _id string [pk]
+  question_pool int
+  question_pool_strategy bool
+  description string
+  start_date datetime
+  start_time datetime
+  end_date datetime
+  end_time datetime
+  duration long
+  visibility bool
+
+  // [DBRef] { $ref: "subject", $id: ... }
+  exams_subject string
+
+  // [DBRef] { $ref: "examiner", $id: ... } – opcjonalne
+  conducting_examiner string
+
+  // [DBRef[]] students: [ { $ref: "student", $id: ... }, ... ]
+  students json
+
+  _class string
+}
+
+Table "exams_database.openquestion" as OpenQuestion {
+  _id string [pk]
+  content string
+  score int
+
+  // [DBRef] { $ref: "exam", $id: ... }
+  exam string
+
+  _class string
+}
+
+Table "exams_database.closedquestion" as ClosedQuestion {
+  _id string [pk]
+  content string
+  score int
+
+  // [DBRef] { $ref: "exam", $id: ... }
+  exam string
+
+  _class string
+}
+
+Table "exams_database.answerclosed" as AnswerClosed {
+  _id string [pk]
+  description string
+  isCorrect bool
+
+  // [DBRef] { $ref: "closedquestion", $id: ... }
+  closedquestionQuestionid string
+
+  _class string
+}
+
+Table "exams_database.studentopenanswer" as StudentOpenAnswer {
+  _id string [pk]
+  score int
+  date datetime
+  time datetime
+  description string
+
+  // [DBRef] { $ref: "openquestion", $id: ... }
+  openquestion_questionid string
+
+  // [DBRef] { $ref: "student", $id: ... }
+  student_student string
+
+  _class string
+}
+
+Table "exams_database.studentclosedanswer" as StudentClosedAnswer {
+  _id string [pk]
+  correctness bool
+  date datetime
+
+  // [DBRef] { $ref: "answerclosed", $id: ... }
+  answerclosed_answerid string
+
+  // [DBRef] { $ref: "closedquestion", $id: ... }
+  closedquestion_questionid string
+
+  // [DBRef] { $ref: "student", $id: ... }
+  student_student string
+
+  _class string
+}
+
+Table "exams_database.logs" as Log {
+  _id string [pk]
+  description string
+  date datetime
+  time datetime
+  _class string
+}
+
+Table "exams_database.logstudentexam" as LogStudentExam {
+  _id string [pk]
+  description string
+  date datetime
+  time datetime
+  score_result int
+
+  // [DBRef] { $ref: "exam", $id: ... }
+  exam_examid string
+
+  // [DBRef] { $ref: "student", $id: ... }
+  student_studentid string
+
+  _class string
+}
+
+Table "exams_database.servicestatistics" as ServiceStatistic {
+  _id string [pk]
+  visitorscount int
+  examscount int
+  studentscount int
+  examinatorscount int
+  startdate datetime
+  _class string
+}
+
+Table "exams_database.problem" as Problem {
+  _id string [pk]
+
+  // w Mongo: { $binary: { base64: "...", subType: "00" } }
+  photo json
+
+  description string
+  category string
+  username string
+  status string
+
+  // [DBRef] { $ref: "student", $id: ... }
+  problems_student string
+
+  // [DBRef] { $ref: "examiner", $id: ... }
+  problems_examiner string
+
+  _class string
+}
+
+//////////////////////////////////////
+// RELACJE (DBRef jako Ref:)        //
+//////////////////////////////////////
+
+// Exam -> Subject, Examiner
+Ref: Subject._id < Exam.exams_subject
+Ref: Examiner._id < Exam.conducting_examiner
+
+// Exam -> OpenQuestion / ClosedQuestion
+Ref: Exam._id < OpenQuestion.exam
+Ref: Exam._id < ClosedQuestion.exam
+
+// ClosedQuestion -> AnswerClosed
+Ref: ClosedQuestion._id < AnswerClosed.closedquestionQuestionid
+
+// OpenQuestion -> StudentOpenAnswer
+Ref: OpenQuestion._id < StudentOpenAnswer.openquestion_questionid
+
+// Student -> StudentOpenAnswer / StudentClosedAnswer
+Ref: Student._id < StudentOpenAnswer.student_student
+Ref: Student._id < StudentClosedAnswer.student_student
+
+// AnswerClosed -> StudentClosedAnswer
+Ref: AnswerClosed._id < StudentClosedAnswer.answerclosed_answerid
+
+// ClosedQuestion -> StudentClosedAnswer
+Ref: ClosedQuestion._id < StudentClosedAnswer.closedquestion_questionid
+
+// LogStudentExam -> Exam, Student
+Ref: Exam._id < LogStudentExam.exam_examid
+Ref: Student._id < LogStudentExam.student_studentid
+
+// Problem -> Student, Examiner
+Ref: Student._id < Problem.problems_student
+Ref: Examiner._id < Problem.problems_examiner
+
+// Group.students & Exam.students – tablice DBRef na Student
+Ref: Student._id < Group.students
+Ref: Student._id < Exam.students

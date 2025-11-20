@@ -68,6 +68,7 @@ public class SpringSecurityConfiguration {
                         .requestMatchers(AntPathRequestMatcher.antMatcher("/administrator/deactivate/{id}")).hasRole("ADMIN")
                         .requestMatchers(AntPathRequestMatcher.antMatcher("/delete/**")).hasRole("ADMIN")
                         .requestMatchers(AntPathRequestMatcher.antMatcher("/exam/**")).hasAnyRole("ADMIN", "EXAMINER", "STUDENT")
+                        .requestMatchers(AntPathRequestMatcher.antMatcher("/evaluateExam")).hasAnyRole("ADMIN", "EXAMINER")
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
@@ -84,14 +85,14 @@ public class SpringSecurityConfiguration {
                         .maxSessionsPreventsLogin(false)
                 )
                 .logout(logout -> logout
-                                .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
-                                .logoutSuccessUrl("/login")
-                                .invalidateHttpSession(true)
-                                .clearAuthentication(true)
-                                .deleteCookies("JSESSIONID", "remember-me")
-                                .addLogoutHandler((request, response, authentication) -> {
-                                })
-                                .permitAll()
+                        .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
+                        .logoutSuccessUrl("/login")
+                        .invalidateHttpSession(true)
+                        .clearAuthentication(true)
+                        .deleteCookies("JSESSIONID", "remember-me")
+                        .addLogoutHandler((request, response, authentication) -> {
+                        })
+                        .permitAll()
                 )
                 .rememberMe(remember -> remember
                         .rememberMeParameter("remember-me")

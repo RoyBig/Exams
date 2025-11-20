@@ -1,9 +1,8 @@
 package com.example.exams.Repositories.Db;
 
-import com.example.exams.Model.Data.db.OpenQuestion;
-import com.example.exams.Model.Data.db.Student;
-import com.example.exams.Model.Data.db.Studentopenanswer;
+import com.example.exams.Model.Data.db.*;
 import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -16,4 +15,7 @@ public interface StudentopenanswerRepository extends MongoRepository<Studentopen
     List<Studentopenanswer> findAllByStudentStudent(Student student);
 
     List<Studentopenanswer> findByOpenquestionQuestionid(OpenQuestion openQuestion);
+
+    @Query("{ 'student_student.$id' : ?0, 'openquestion_questionid.$id' : ?1 }")
+    Studentopenanswer findByStudentStudentAndOpenquestionQuestionid(Student student, OpenQuestion openQuestion);
 }

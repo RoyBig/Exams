@@ -35,9 +35,14 @@ public class LogstudentexamService {
         return logstudentexamRepository.findLogstudentexamsByExamExamid(exam);
     }
 
-    public void setDateTimeExaminerComment(Student student, Exam exam, String examinerComment){
-        Logstudentexam logstudentexam = logstudentexamRepository
-                .findLogstudentexamByStudentStudentAndExamExamid(student, exam);
+    public void setDateTimeExaminerComment(Student student, Exam exam, String examinerComment) {
+        Logstudentexam logstudentexam = logstudentexamRepository.findLogstudentexamByStudentStudentAndExamExamid(student, exam);
+        if (logstudentexam == null) {
+            logstudentexam = new Logstudentexam();
+            logstudentexam.setStudentStudent(student);
+            logstudentexam.setExamExamid(exam);
+            logstudentexam.setScoreresult(0);
+        }
         logstudentexam.setDate(LocalDate.now());
         logstudentexam.setTime(LocalTime.now());
         logstudentexam.setDescription(examinerComment);
