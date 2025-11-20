@@ -21,7 +21,7 @@ public class ExamServiceTest {
         exam1.setVisibility(false);
         when(examRepository.findById(1)).thenReturn(java.util.Optional.of(exam1));
 
-        ExamService realExamService = new ExamService(examRepository, null, null, null, null, null, null);
+        ExamService realExamService = new ExamService(examRepository, null, null, null, null, null, null,null);
         realExamService.changeExamVisibility(1);
 
         verify(examRepository, times(1)).findById(1);

@@ -23,7 +23,7 @@ public class Problem {
     @Column(name = "problemid", nullable = false)
     private Integer id;
 
-    @Column(name = "photo", columnDefinition = "LONGBLOB")
+    @Column(name = "photo", columnDefinition = "bytea")
     private byte[] photo;
 
     @Column(name = "description", length = 100)
