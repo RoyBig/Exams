@@ -27,8 +27,12 @@ public class ExaminerService {
         return examiner.orElse(null);
     }
 
-    public Examiner getExaminerByLoginAndEmail(String login, String email){
-        return examinersRepository.findExaminerByLoginAndEmail(login, email);
+    public Examiner getExaminerByLogin(String login){
+        return examinersRepository.findByLogin(login);
+    }
+
+    public Examiner getExaminerByEmail(String email){
+        return examinersRepository.findByEmail(email);
     }
 
     public Examiner findByLogin(String name){
@@ -54,7 +58,8 @@ public class ExaminerService {
 
 
     public void editExaminer(Integer examinerId, String firstName, String lastName, String login, String password, String email){
-        Examiner examiner = examinersRepository.findExaminerById(examinerId);
+        Examiner examiner = examinersRepository.
+                findExaminerById(examinerId);
 
         if(examiner != null){
             if(firstName != null && !firstName.trim().isEmpty())

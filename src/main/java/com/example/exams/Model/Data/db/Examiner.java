@@ -1,6 +1,6 @@
 package com.example.exams.Model.Data.db;
 
-import jakarta.persistence.*;
+import javax.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -34,14 +34,14 @@ public class Examiner {
     @Column(name = "verification_status", nullable = false)
     private boolean verificationStatus;
 
-    @OneToMany(mappedBy = "problemsExaminer",fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    private List<Problem> problems;
+    //@OneToMany(mappedBy = "problemsExaminer",fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    //private List<Problem> problems;
 
-    @OneToMany(mappedBy = "conductingExaminer",fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    private List<Exam> exams;
+    //@OneToMany(mappedBy = "conductingExaminer",fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    //private List<Exam> exams;
 
-    @OneToMany(mappedBy = "egzaminatorEgzaminator",fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    private List<Relation23> relation23s;
+    //@OneToMany(mappedBy = "egzaminatorEgzaminator",fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    //private List<Relation23> relation23s;
 
     public Examiner() {}
 

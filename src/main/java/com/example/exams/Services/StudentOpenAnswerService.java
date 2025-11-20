@@ -2,7 +2,7 @@ package com.example.exams.Services;
 
 import com.example.exams.Model.Data.db.Studentopenanswer;
 import com.example.exams.Repositories.Db.StudentopenanswerRepository;
-import jakarta.persistence.EntityNotFoundException;
+import javax.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

@@ -6,10 +6,10 @@ import com.example.exams.Model.Data.db.Exam;
 import com.example.exams.Model.Data.db.OpenQuestion;
 import com.example.exams.Model.Data.db.Student;
 import com.example.exams.Model.Data.db.Studentclosedanswer;
-import com.example.exams.Repositories.Db.ExamRepository;
 import com.example.exams.Repositories.Db.StudentclosedanswerRepository;
 import com.example.exams.Repositories.Db.StudentsEntityRepository;
 import com.example.exams.SpringSecurity.CustomUserDetails;
+import com.example.exams.Repositories.Db.ExamRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import jakarta.servlet.http.HttpSession;
@@ -17,18 +17,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
 
 @Service
 public class ExamService {
@@ -86,10 +87,22 @@ public class ExamService {
         exam.setExamsSubject(subjectService.GetOne(examDTO.getSubjectId()));
         exam.setConductingExaminer(egzaminatorService.Get(examDTO.getEgzamiantor()));
         exam.setDescription(examDTO.getDescription());
-        exam.setStartDate(examDTO.getStartDate());
-        exam.setStartTime(examDTO.getStartTime());
-        exam.setEndDate(examDTO.getEndDate());
-        exam.setEndTime(examDTO.getEndTime());
+        if(examDTO.getStartDate()==null){
+            exam.setStartDate(LocalDate.now());
+        }
+        else exam.setStartDate(examDTO.getStartDate());
+        if(examDTO.getStartTime()==null){
+            exam.setStartTime(LocalTime.now());
+        }
+        else exam.setStartTime(examDTO.getStartTime());
+        if(examDTO.getEndDate()==null){
+            exam.setEndDate(LocalDate.now());
+        }
+        else exam.setEndDate(examDTO.getEndDate());
+        if(examDTO.getEndTime()==null){
+            exam.setEndTime(LocalTime.now().plusHours(2));
+        }
+        else exam.setEndTime(examDTO.getEndTime());
         if(exam.getStartDate()!=null && exam.getEndDate()!=null && exam.getStartTime()!=null && exam.getEndTime()!=null) {
             exam.setDuration(Duration.between(LocalDateTime.of(exam.getStartDate(), exam.getStartTime()), LocalDateTime.of(exam.getEndDate(), exam.getEndTime())).toMinutes());
         }
@@ -253,6 +266,7 @@ public class ExamService {
         }
         return exams;
     }
+
     public void changeExamPoolStrategy(boolean poolStrategy, Exam exam){
         if(exam.getQuestionPoolStrategy() != poolStrategy) {
             exam.setQuestionPoolStrategy(poolStrategy);
@@ -298,11 +312,12 @@ public class ExamService {
     }
 
     public boolean hasUserAlreadySolvedExam(Integer userId, Integer examId) {
-
+        /*
         List<Studentclosedanswer> studentclosedanswers = studentclosedanswerRepository
                                   .findAllByAnswerclosedAnswerid_ClosedquestionQuestionid_Exam_Id_AndStudentStudent_StudentId(examId, userId);
 
-        return studentclosedanswers.isEmpty();
+        return studentclosedanswers.isEmpty(); */
+        return false;
     }
 
 

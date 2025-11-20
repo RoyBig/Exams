@@ -58,7 +58,6 @@ public class ClosedQuestionService {
     public void deleteAllClosedQuestionsByExamId(int examId) {
         List<Closedquestion> questions = closedQuestionRepository.findByExamId(examId);
         for (Closedquestion question : questions) {
-
             studentClosedAnswerService.deleteStudentClosedAnswersByQuestionId(question.getId());
             answerClosedService.deleteAnswersByQuestionId(question.getId());
             closedQuestionRepository.deleteById(question.getId());

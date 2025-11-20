@@ -1,6 +1,6 @@
 package com.example.exams.Model.Data.db;
 
-import jakarta.persistence.*;
+import javax.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,7 +13,7 @@ import java.time.LocalTime;
 
 @Getter
 @Setter
-@Entity
+//@Entity
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "logstudentexam")

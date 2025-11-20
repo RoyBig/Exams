@@ -39,11 +39,13 @@ public class AnswerClosedService {
     }
     public Answerclosed addAnswerClosed(Answerclosed newAnswerClosed, Closedquestion closedquestion){
         newAnswerClosed.setClosedquestionQuestionid(closedquestion);
-        return answerClosedRepository.save(newAnswerClosed);
+        answerClosedRepository.save(newAnswerClosed);
+        return newAnswerClosed;
     }
 
     public Answerclosed save(Answerclosed answerclosed) {
-        return answerClosedRepository.save(answerclosed);
+        answerClosedRepository.save(answerclosed);
+        return answerclosed;
     }
 
     public Answerclosed getAnswerClosedById(String answerId) {

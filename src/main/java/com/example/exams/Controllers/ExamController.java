@@ -10,7 +10,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
-import jakarta.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaBuilder;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
@@ -54,9 +54,6 @@ public class ExamController {
 
     @Autowired
     ExaminerService examinerService;
-
-    @Autowired
-    AdministartorService administartorService;
 
     @Autowired
     OpenQuestionService openQuestionService;
@@ -122,7 +119,6 @@ public class ExamController {
                         .registerModule(new JavaTimeModule());
                 ExamDTO exam = objectMapper.readValue(decodedString, ExamDTO.class);
                 exam.setEgzamiantor(examinerService.findByLogin(authentication.getName()).getExaminer_id());
-                exam.setAdministator(administartorService.getAdminByLogin(authentication.getName()).getAdministrator_id());
 
                 UserDetails user = null;
                 HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
@@ -618,7 +614,7 @@ public class ExamController {
 
         Exam exam = examService.GetExam(examId);
         if ("closed".equals(type)) {
-            logsService.addClosedQuestionToExam(examId.intValue(), closedquestion);
+            //logsService.addClosedQuestionToExam(examId.intValue(), closedquestion);
             closedquestion.setExam(exam);
             closedQuestionService.addClosedQuestion(closedquestion);
             for (int i = 0; i < closedanswer.size(); i++) {
@@ -631,7 +627,7 @@ public class ExamController {
             }
 
         } else {
-            logsService.addOpenQuestionToExam(examId.intValue(), openQuestion);
+            //logsService.addOpenQuestionToExam(examId.intValue(), openQuestion);
             openQuestion.setExam(exam);
             openQuestionService.AddOpenQuestion(openQuestion);
         }

@@ -3,7 +3,7 @@ package com.example.exams.Model.Data.db;
 import com.example.exams.Model.Data.ProperDataModels.ProblemCategories;
 import com.example.exams.Model.Data.ProperDataModels.ProblemStatus;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.*;
+import javax.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,7 +13,7 @@ import org.hibernate.annotations.OnDeleteAction;
 
 @Getter
 @Setter
-@Entity
+//@Entity
 @Table(name = "problem")
 @AllArgsConstructor
 @NoArgsConstructor

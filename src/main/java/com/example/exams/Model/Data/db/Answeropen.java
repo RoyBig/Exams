@@ -1,12 +1,12 @@
 package com.example.exams.Model.Data.db;
 
-import jakarta.persistence.*;
+import javax.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-@Entity
+//@Entity
 @Table(name = "answeropen")
 public class Answeropen {
     @Id

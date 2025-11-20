@@ -1,6 +1,6 @@
 package com.example.exams.Model.Data.db;
 
-import jakarta.persistence.*;
+import javax.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -10,7 +10,7 @@ import java.util.Date;
 
 @Getter
 @Setter
-@Entity
+//@Entity
 @Table(name = "logs")
 public class Log {
     @Id
@@ -34,5 +34,4 @@ public class Log {
         this.date = LocalDate.now();
         this.time = LocalTime.now().withNano(0);
     }
-
 }

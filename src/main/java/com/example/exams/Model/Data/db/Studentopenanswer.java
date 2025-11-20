@@ -1,6 +1,6 @@
 package com.example.exams.Model.Data.db;
 
-import jakarta.persistence.*;
+import javax.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -9,7 +9,7 @@ import java.time.LocalTime;
 
 @Getter
 @Setter
-@Entity
+//@Entity
 @Table(name = "studentopenanswer")
 public class Studentopenanswer {
     @Id

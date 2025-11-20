@@ -1,6 +1,6 @@
 package com.example.exams.Model.Data.db;
 
-import jakarta.persistence.*;
+import javax.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.OnDelete;
@@ -68,8 +68,8 @@ public class Exam {
     @Column(name="visibility")
     private Boolean visibility;
 
-    @ManyToOne(fetch = FetchType.EAGER, optional = false)
-    @JoinColumn(name = "exams_subject_id", nullable = false)
+    @ManyToOne(fetch = FetchType.EAGER, optional = true)
+    @JoinColumn(name = "exams_subject_id", nullable = true)
     private Subject examsSubject;
 
     @ManyToOne(fetch = FetchType.EAGER)

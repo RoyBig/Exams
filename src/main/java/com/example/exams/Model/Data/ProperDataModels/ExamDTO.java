@@ -34,7 +34,4 @@ public class ExamDTO {
 
     @JsonProperty("egzaminator")
     private Integer egzamiantor;
-
-    @JsonProperty("administrator")
-    private Integer administator;
 }

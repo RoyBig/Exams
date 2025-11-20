@@ -14,7 +14,7 @@
     <link rel="stylesheet" href="../static/css/createExam.css"/>
 </head>
 <body>
-<div th:insert="navigation :: navigation"></div>
+<div th:insert="~{navigation :: navigation}"></div>
 
 <div class="container-list">
     <p>Exam List</p>
@@ -50,7 +50,6 @@
         </div>
     </form>
 
-
     <form class="add-exam-form">
         <button sec:authorize="hasRole('ROLE_ADMIN') or hasRole('ROLE_EXAMINER')" type="button"
                 class="create-exam-submit"><i class="fa-solid fa-plus"></i>Create Exam
@@ -70,61 +69,79 @@
         </thead>
 
         <tbody>
-        <form th:object="${exams}" th:action="@{/processForm}" method="post">
-            <tr th:each="exam : ${exams}">
-                <td th:text="${exam.id}"></td>
-                <td th:text="${exam.description}"></td>
-                <td th:text="${exam.getStartDate + ' ' + exam.getStartTime}"></td>
-                <td th:text="${exam.getEndDate + ' ' + exam.getEndTime}"></td>
-                <td th:text="${exam.getExamsSubject.name}"></td>
-                <td class="buttons_exam">
+        <tr th:each="exam : ${exams}">
+            <td th:text="${exam.id} ?: 'Brak danych'"></td>
+            <td th:text="${exam.description} ?: 'Brak danych'"></td>
+            <td th:text="${exam.startDate != null ? exam.startDate + ' ' + exam.startTime : 'Brak danych'}"></td>
+            <td th:text="${exam.endDate != null ? exam.endDate + ' ' + exam.endTime : 'Brak danych'}"></td>
+            <td th:text="${exam.examsSubject != null ? exam.examsSubject.name : 'Brak danych'}"></td>
+            <td class="buttons_exam">
+                <button class="operations-btn" type="button" onclick="toggleOperations(this)">CHOOSE OPERATION</button>
+                <div class="operations" style="display: none;">
                     <div class="box-btn">
-                        <button sec:authorize="hasRole('ROLE_ADMIN') or hasRole('ROLE_EXAMINER')" type="submit"
-                                name="action" th:value="'show:'+ ${exam.id}" class="edit-delete">
-                            <i class="fa-solid fa-pen"></i>Details
-                        </button>
-                        <button sec:authorize="hasRole('ROLE_ADMIN') or hasRole('ROLE_EXAMINER') or hasRole('ROLE_STUDENT')" type="submit"
-                                name="action" th:value="'results:'+ ${exam.id}" class="edit-delete">
-                            <i class="fa-solid fa-square-poll-vertical"></i>Results
-                        </button>
-                        <button sec:authorize="hasRole('ROLE_ADMIN') or hasRole('ROLE_EXAMINER')" type="submit"
-                                name="action" th:value="'addStudents:' + ${exam.id}" class="edit-delete">
-                            <i class="fa-solid fa-plus"></i> Students
-                        </button>
-                        <button sec:authorize="hasRole('ROLE_ADMIN') or hasRole('ROLE_EXAMINER')" type="submit"
-                                name="action" th:value="'addQuestion:'+ ${exam.id}" class="edit-delete">
-                            <i class="fa-solid fa-plus"></i> Question
-                        </button>
-                        <button sec:authorize="hasRole('ROLE_STUDENT')" type="submit" name="action"
-                                th:value="'solveExam:'+ ${exam.id}" class="edit-delete">
-                            <i class="fa-solid fa-pen-ruler"></i>Solve Exam
-                        </button>
+                        <form th:action="@{/processForm}" method="post" sec:authorize="hasRole('ROLE_ADMIN') or hasRole('ROLE_EXAMINER')">
+                            <button type="submit" name="action" th:value="'show:' + ${exam.id}" class="edit-delete">
+                                <i class="fa-solid fa-pen"></i>Details
+                            </button>
+                        </form>
+
+                        <form th:action="@{/processForm}" method="post" sec:authorize="hasRole('ROLE_ADMIN') or hasRole('ROLE_EXAMINER') or hasRole('ROLE_STUDENT')">
+                            <button type="submit" name="action" th:value="'results:' + ${exam.id}" class="edit-delete">
+                                <i class="fa-solid fa-square-poll-vertical"></i>Results
+                            </button>
+                        </form>
+
+                        <form th:action="@{/processForm}" method="post" sec:authorize="hasRole('ROLE_ADMIN') or hasRole('ROLE_EXAMINER')">
+                            <button type="submit" name="action" th:value="'addStudents:' + ${exam.id}" class="edit-delete">
+                                <i class="fa-solid fa-plus"></i> Students
+                            </button>
+                        </form>
+
+                        <form th:action="@{/processForm}" method="post" sec:authorize="hasRole('ROLE_ADMIN') or hasRole('ROLE_EXAMINER')">
+                            <button type="submit" name="action" th:value="'addQuestion:' + ${exam.id}" class="edit-delete">
+                                <i class="fa-solid fa-plus"></i> Question
+                            </button>
+                        </form>
+
+                        <form th:action="@{/processForm}" method="post" sec:authorize="hasRole('ROLE_STUDENT')">
+                            <button type="submit" name="action" th:value="'solveExam:' + ${exam.id}" class="edit-delete">
+                                <i class="fa-solid fa-pen-ruler"></i>Solve Exam
+                            </button>
+                        </form>
                     </div>
 
                     <div class="box-btn2">
-                        <button sec:authorize="hasRole('ROLE_ADMIN') or hasRole('ROLE_EXAMINER')" type="submit"
-                                name="action" th:value="'showDoneExamUser:'+ ${exam.id}" class="edit-delete">
-                            <i class="fa-solid fa-pen"></i>Rate
-                        </button>
-                        <button sec:authorize="hasRole('ROLE_ADMIN') or hasRole('ROLE_EXAMINER')" type="submit"
-                                name="action" th:value="'edit:'+ ${exam.id}" class="edit-delete">
-                            <i class="fa-solid fa-pen"></i>Edit
-                        </button>
-                        <button sec:authorize="hasRole('ROLE_ADMIN') or hasRole('ROLE_EXAMINER')" type="submit"
-                                name="action" th:value="'delete:'+ ${exam.id}" class="edit-delete">
-                            <i class="fa-solid fa-trash"></i>Delete
-                        </button>
-                        <button sec:authorize="hasRole('ROLE_ADMIN') or hasRole('ROLE_EXAMINER')" type="submit"
-                                name="action" th:value="'toggleVisibility:'+ ${exam.id}" class="edit-delete">
-                            <i class="fa-solid fa-eye"></i><span th:text="${exam.visibility != null ? exam.visibility ? 'Visible' : 'Invisible' : 'Default'}"></span>
-                        </button>
-                    </div>
-                </td>
-            </tr>
-        </form>
-        </tbody>
+                        <form th:action="@{/processForm}" method="post" sec:authorize="hasRole('ROLE_ADMIN') or hasRole('ROLE_EXAMINER')">
+                            <button type="submit" name="action" th:value="'showDoneExamUser:' + ${exam.id}" class="edit-delete">
+                                <i class="fa-solid fa-pen"></i>Rate
+                            </button>
+                        </form>
 
+                        <form th:action="@{/processForm}" method="post" sec:authorize="hasRole('ROLE_ADMIN') or hasRole('ROLE_EXAMINER')">
+                            <button type="submit" name="action" th:value="'edit:' + ${exam.id}" class="edit-delete">
+                                <i class="fa-solid fa-pen"></i>Edit
+                            </button>
+                        </form>
+
+                        <form th:action="@{/processForm}" method="post" sec:authorize="hasRole('ROLE_ADMIN') or hasRole('ROLE_EXAMINER')">
+                            <button type="submit" name="action" th:value="'delete:' + ${exam.id}" class="edit-delete">
+                                <i class="fa-solid fa-trash"></i>Delete
+                            </button>
+                        </form>
+
+                        <form th:action="@{/processForm}" method="post" sec:authorize="hasRole('ROLE_ADMIN') or hasRole('ROLE_EXAMINER')">
+                            <button type="submit" name="action" th:value="'toggleVisibility:' + ${exam.id}" class="edit-delete">
+                                <i class="fa-solid fa-eye"></i>
+                                <span th:text="${exam.visibility != null ? exam.visibility ? 'Visible' : 'Invisible' : 'Default'}"></span>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </td>
+        </tr>
+        </tbody>
     </table>
+
 </div>
 
 <div class="overlay hidden" id="overlay"></div>
@@ -144,8 +161,6 @@
         <form th:action="@{/addExam/${egzaminator_egzaminator_id}}" th:object="${exam}" method="post" role="form" id="formularz">
             <div class="input-box">
                 <label>Subject</label>
-                <!--/*@thymesVar id="Subject" type="com.example.exams.Model.Data.db.Subject"*/-->
-                <!--/*@thymesVar id="subjects" type="java.util.List"*/-->
                 <select id="subjectidcreate" name="subject_subject_id" class="selectCreate">
                     <option th:each="Subject : ${subjects}" th:value="${Subject.id}" th:text="${Subject.name}"></option>
                 </select>
@@ -172,16 +187,13 @@
 
             <div class="questions">
                 <label>Questions List</label>
-
-                <div class="question-inputs">
-
-                </div>
-
+                <div class="question-inputs"></div>
                 <button class="addQuestion" type="button">Add Question</button>
             </div>
         </form>
     </div>
 </div>
+
 <div class="edit-exam-box hidden">
     <h2>Edit an Exam</h2>
     <div class="contener">
@@ -200,8 +212,8 @@
             </div>
 
             <div class="input-box">
-                <label>Description</label
-                ><input type="text" name="description" class="form-control"/>
+                <label>Description</label>
+                <input type="text" name="description" class="form-control"/>
             </div>
 
             <div class="date-box">
@@ -220,14 +232,19 @@
 
             <div class="questions">
                 <label>Questions List to Edit</label>
-
                 <div class="questionList"><p class="info">-------</p></div>
-
                 <button class="addQuestion">Edit Questions</button>
             </div>
         </form>
     </div>
 </div>
+
+<script>
+    function toggleOperations(button) {
+        const operationsDiv = button.nextElementSibling;
+        operationsDiv.style.display = operationsDiv.style.display === 'block' ? 'none' : 'block';
+    }
+</script>
 
 <script type="text/javascript" th:src="@{/javascript/exams.js}"></script>
 <script src="../static/javascript/exams.js"></script>
@@ -248,6 +265,7 @@
             document.forms["main-form"].submit();
         });
     });
+
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.has('sortType')) {
         const sortType = urlParams.get('sortType');
@@ -255,11 +273,7 @@
     }
 </script>
 
-<!-- przycisk "Powrot na gore" -->
-<!--<button id="back-to-top" style="display: none; position: fixed; bottom: 20px; right: 20px;">↑ Powrót na górę</button>-->
 <button id="back-to-top">↑ Powrót na górę</button>
-
-</body>
 
 <script>
     window.onscroll = function() {
@@ -274,4 +288,6 @@
         window.scrollTo({top: 0, behavior: 'smooth'});
     };
 </script>
+</body>
 </html>
+
