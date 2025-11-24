@@ -45,6 +45,7 @@ public class Problem {
     @Column(name = "username", length = 20)
     private String username;
 
-    @Column(name = "status")
+    @Enumerated(EnumType.STRING)
     private ProblemStatus status = ProblemStatus.New;
+
 }
