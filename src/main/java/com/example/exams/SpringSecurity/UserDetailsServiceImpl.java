@@ -60,9 +60,9 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         UserDetails userDetails = null;
 
         if (administrator != null && administrator.isVerificationStatus()) {
-            userDetails = buildUserDetails(administrator.getAdministrator_id(), administrator.getLogin(), administrator.getPassword(), Collections.singleton("ADMIN"));
+            userDetails = buildUserDetails(administrator.getStudentId(), administrator.getLogin(), administrator.getPassword(), Collections.singleton("ADMIN"));
         } else if (examiner != null && examiner.isVerificationStatus()) {
-            userDetails = buildUserDetails(examiner.getExaminer_id(), examiner.getLogin(), examiner.getPassword(), Collections.singleton("EXAMINER"));
+            userDetails = buildUserDetails(examiner.getStudentId(), examiner.getLogin(), examiner.getPassword(), Collections.singleton("EXAMINER"));
         } else if (student != null) {
             userDetails = buildUserDetails(student.getStudentId(), student.getLogin(), student.getPassword(), Collections.singleton("STUDENT"));
         }

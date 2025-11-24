@@ -15,7 +15,7 @@ public interface ExaminerRepository extends JpaRepository<Examiner, Integer> {
     Examiner findExaminerByLogin(String login);
     Examiner findByLogin(String login);
     Examiner findExaminerByLoginAndEmail(String login, String email);
-    @Query("SELECT e FROM Examiner e WHERE e.examiner_id = :id")
+    @Query("SELECT e FROM Examiner e WHERE e.studentId = :id")
     Examiner findExaminerById(@Param("id") Integer id);
 
     List<Examiner> findAll();

@@ -121,8 +121,8 @@ public class ExamController {
                         .registerModule(new Jdk8Module())
                         .registerModule(new JavaTimeModule());
                 ExamDTO exam = objectMapper.readValue(decodedString, ExamDTO.class);
-                exam.setEgzamiantor(examinerService.findByLogin(authentication.getName()).getExaminer_id());
-                exam.setAdministator(administartorService.getAdminByLogin(authentication.getName()).getAdministrator_id());
+                exam.setEgzamiantor(examinerService.findByLogin(authentication.getName()).getStudentId());
+                exam.setAdministator(administartorService.getAdminByLogin(authentication.getName()).getStudentId());
 
                 UserDetails user = null;
                 HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
@@ -294,7 +294,7 @@ public class ExamController {
         int points = answerOpenService.updateScores(student, scores);
         logstudentexamService.addOpenPoints(student, exam, points);
 
-        String sendTo = student.getEmail();
+        String sendTo = student.getEmail().get();
         String subject = "Wyniki egzaminu";
         String text = String.format("Twój egzamin '%s' został oceniony. Uzyskałeś %d punktów. Komentarz egzaminatora: %s", exam.getDescription(), points, examinerComment);
         //notificationService.sendNotification(sendTo, subject, text);

@@ -1,6 +1,7 @@
 package com.example.exams.Services;
 
 import com.example.exams.Model.Data.db.Administrator;
+import com.example.exams.Model.Data.db.Email;
 import com.example.exams.Model.Data.db.Examiner;
 import com.example.exams.Model.Data.db.Student;
 import com.example.exams.Repositories.Db.AdministratorsEntityRepository;
@@ -52,7 +53,7 @@ public class AdministartorService {
                 administrator.setPassword(password);
 
             if(email != null && !email.trim().isEmpty())
-                administrator.setEmail(email);
+                administrator.setEmail(Email.of(email));
 
             administratorsEntityRepository.save(administrator);
         }

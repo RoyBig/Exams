@@ -137,7 +137,7 @@ public class GroupsController {
         String lastName = editedStudent.getLastname();
         String login = editedStudent.getLogin();
         String password = editedStudent.getPassword();
-        String email = editedStudent.getEmail();
+        String email = editedStudent.getEmail().get();
 
         studentsService.editStudent(studentId, firstName, lastName, login, password, email);
         return "redirect:/manageGroup/" + groupId;

@@ -1,5 +1,6 @@
 package com.example.exams.Services;
 
+import com.example.exams.Model.Data.db.Email;
 import com.example.exams.Model.Data.db.Examiner;
 import com.example.exams.Model.Data.db.Student;
 import com.example.exams.Repositories.Db.ExaminerRepository;
@@ -70,7 +71,7 @@ public class ExaminerService {
                 examiner.setPassword(password);
 
             if(email != null && !email.trim().isEmpty())
-                examiner.setEmail(email);
+                examiner.setEmail(Email.of(email));
 
             examinersRepository.save(examiner);
         }

@@ -56,9 +56,9 @@ public class DatabaseSeeder implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        administratorRepository.save(new Administrator(1, "Krzysztof", "Konon", "wipb", "pebegate", "wi@pb.edu.pl", true));
-        administratorRepository.save(new Administrator(2, "Wojciech", "Walerian", "wojtek", "1", "wojtek@pb.edu.pl", true));
-        administratorRepository.save(new Administrator(3, "Mariusz", "Kowalczyk", "m", "m", "m@pb.edu.pl", true));
+        administratorRepository.save(new Administrator(1, "Krzysztof", "Konon", "wipb", "pebegate", new Email("wi@pb.edu.pl"), true));
+        administratorRepository.save(new Administrator(2, "Wojciech", "Walerian", "wojtek", "1", new Email("wojtek@pb.edu.pl"), true));
+        administratorRepository.save(new Administrator(3, "Mariusz", "Kowalczyk", "m", "m", new Email("m@pb.edu.pl"), true));
 
         subjectRepository.save(new Subject(1, "Matematyka"));
         subjectRepository.save(new Subject(2, "Angielski"));
@@ -66,9 +66,9 @@ public class DatabaseSeeder implements CommandLineRunner {
         subjectRepository.save(new Subject(4, "Historia"));
         subjectRepository.save(new Subject(5, "Niemiecki"));
 
-        Examiner examiner1 = new Examiner(1, "Slawomir", "Golibroda", "z", "z", "s.golibrodai@pb.edu.pl", true);
-        Examiner examiner2 = new Examiner(2, "Dorota", "Warka", "warka", "warka", "wedliny@pb.edu.pl", true);
-        Examiner examiner3 = new Examiner(3, "Julita", "Komarewska", "enjoyer", "szastprast", "smok@pb.edu.pl", false);
+        Examiner examiner1 = new Examiner(1, "Slawomir", "Golibroda", "z", "z", new Email("s.golibrodai@pb.edu.pl"), true);
+        Examiner examiner2 = new Examiner(2, "Dorota", "Warka", "warka", "warka", new Email("wedliny@pb.edu.pl"), true);
+        Examiner examiner3 = new Examiner(3, "Julita", "Komarewska", "enjoyer", "szastprast", new Email("smok@pb.edu.pl"), false);
         examinerRepository.save(examiner1);
         examinerRepository.save(examiner2);
         examinerRepository.save(examiner3);
@@ -76,13 +76,13 @@ public class DatabaseSeeder implements CommandLineRunner {
         List<Student> students1 = new ArrayList<>();
         List<Student> students2 = new ArrayList<>();
 
-        Student student1 = new Student(1, "Anna", "Mosiezna", "a", "a", "a@student.pb.edu.pl");
-        Student student2 = new Student(2, "Bartosz", "Balagan", "balagan", "balagan", "b@student.pb.edu.pl");
-        Student student3 = new Student(3, "Michal", "Cwelarczyk", "cwelarczyk", "cwelarczyk", "c@student.pb.edu.pl");
-        Student student4 = new Student(4, "Danusia", "Dotkowska", "dotkowska", "dotkowska", "d@student.pb.edu.pl");
-        Student student5 = new Student(5, "Eleonora", "Embark", "embark", "embark", "e@student.pb.edu.pl");
-        Student student6 = new Student(6, "Florencja", "Figurska", "figurska", "figurska", "f@student.pb.edu.pl");
-        Student student7 = new Student(7, "Gabriela", "Ciemnik", "ciemnik", "ciemnik", "g@student.pb.edu.pl");
+        Student student1 = new Student(1, "Anna", "Mosiezna", "a", "a", new Email("a@student.pb.edu.pl"));
+        Student student2 = new Student(2, "Bartosz", "Balagan", "balagan", "balagan", new Email("b@student.pb.edu.pl"));
+        Student student3 = new Student(3, "Michal", "Cwelarczyk", "cwelarczyk", "cwelarczyk", new Email("c@student.pb.edu.pl"));
+        Student student4 = new Student(4, "Danusia", "Dotkowska", "dotkowska", "dotkowska", new Email("d@student.pb.edu.pl"));
+        Student student5 = new Student(5, "Eleonora", "Embark", "embark", "embark", new Email("e@student.pb.edu.pl"));
+        Student student6 = new Student(6, "Florencja", "Figurska", "figurska", "figurska", new Email("f@student.pb.edu.pl"));
+        Student student7 = new Student(7, "Gabriela", "Ciemnik", "ciemnik", "ciemnik", new Email("g@student.pb.edu.pl"));
 
         students1.add(student1);
         students1.add(student2);
@@ -107,9 +107,9 @@ public class DatabaseSeeder implements CommandLineRunner {
         groupRepository.save(new Group(4, "pb02", new ArrayList<>()));
         groupRepository.save(new Group(5, "pb03", new ArrayList<>()));
 
-        examinerRepository.save(new Examiner(1, "Slawomir", "Golibroda", "z", "z", "s.golibrodai@pb.edu.pl", true));
-        examinerRepository.save(new Examiner(2, "Ewelina", "Cuda", "ewelinka123", "cuda2115", "cuda@pb.edu.pl", true));
-        examinerRepository.save(new Examiner(3, "Marta", "Koootara", "kotara", "kotara", "kotara@pb.edu.pl", false));
+        examinerRepository.save(new Examiner(1, "Slawomir", "Golibroda", "z", "z", new Email("s.golibrodai@pb.edu.pl"), true));
+        examinerRepository.save(new Examiner(2, "Ewelina", "Cuda", "ewelinka123", "cuda2115", new Email("cuda@pb.edu.pl"), true));
+        examinerRepository.save(new Examiner(3, "Marta", "Koootara", "kotara", "kotara", new Email("kotara@pb.edu.pl"), false));
 
         examRepository.save(new Exam(1, 6, false, "Projektowanie części w SOLIDWORKS", LocalDate.now(), LocalTime.now().withNano(0), LocalDate.now(), LocalTime.now().plusHours(2).withNano(0), subjectRepository.findById(1).get(), students1));
         examRepository.save(new Exam(2, 0, false, "Retusz zdjęć", LocalDate.now().minusDays(2), LocalTime.now().minusHours(4).withNano(0), LocalDate.now(), LocalTime.now().plusHours(1).withNano(0), subjectRepository.findById(1).get(), students1));

@@ -1,5 +1,6 @@
 package com.example.exams.Services;
 
+import com.example.exams.Model.Data.db.Email;
 import com.example.exams.Model.Data.db.Student;
 import com.example.exams.Repositories.Db.StudentsEntityRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,7 +60,7 @@ public class StudentsService {
                 student.setPassword(password);
 
             if(email != null && !email.trim().isEmpty())
-                student.setEmail(email);
+                student.setEmail(Email.of(email));
 
 
             studentsRepository.save(student);

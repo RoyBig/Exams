@@ -8,39 +8,15 @@ import lombok.Setter;
 @Setter
 @Entity
 @Table(name = "administrator")
-public class Administrator {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "administrator_id", nullable = false)
-    private Integer administrator_id;
-
-    @Column(name = "firstname", nullable = false, length = 20)
-    private String firstname;
-
-    @Column(name = "lastname", length = 20)
-    private String lastname;
-
-    @Column(name = "login", length = 20)
-    private String login;
-
-    @Column(name = "password", length = 20)
-    private String password;
-
-    @Column(name = "email", length = 40)
-    private String email;
+public class Administrator extends User {
 
     @Column(name = "verification_status", nullable = false)
     private boolean verificationStatus;
 
     public Administrator() {}
 
-    public Administrator(Integer administrator_id, String firstname, String lastname, String login, String password, String email, boolean verificationStatus) {
-        this.administrator_id = administrator_id;
-        this.firstname = firstname;
-        this.lastname = lastname;
-        this.login = login;
-        this.password = password;
-        this.email = email;
+    public Administrator(Integer administrator_id, String firstname, String lastname, String login, String password, Email email, boolean verificationStatus) {
+        super(administrator_id,firstname,lastname,login,password,email);
         this.verificationStatus = verificationStatus;
     }
 }

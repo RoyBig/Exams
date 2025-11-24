@@ -1,6 +1,7 @@
 package com.example.exams.Services;
 
 import com.example.exams.Model.Data.db.Administrator;
+import com.example.exams.Model.Data.db.Email;
 import com.example.exams.Model.Data.db.Examiner;
 import com.example.exams.Model.Data.ProperDataModels.User;
 import com.example.exams.Model.Data.db.Student;
@@ -41,7 +42,7 @@ public class UsersService {
         administrator.setLastname(user.getLastname());
         administrator.setLogin(user.getLogin());
         administrator.setPassword(user.getPassword());
-        administrator.setEmail(user.getEmail());
+        administrator.setEmail(Email.of(user.getEmail()));
         administrator.setVerificationStatus(false);
         return administrator;
     }
@@ -52,7 +53,7 @@ public class UsersService {
         examiner.setLastname(user.getLastname());
         examiner.setLogin(user.getLogin());
         examiner.setPassword(user.getPassword());
-        examiner.setEmail(user.getEmail());
+        examiner.setEmail(Email.of(user.getEmail()));
         examiner.setVerificationStatus(false);
         return examiner;
     }
@@ -63,7 +64,7 @@ public class UsersService {
         student.setLastname(user.getLastname());
         student.setLogin(user.getLogin());
         student.setPassword(user.getPassword());
-        student.setEmail(user.getEmail());
+        student.setEmail(Email.of(user.getEmail()));
         return student;
     }
 

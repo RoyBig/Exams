@@ -191,7 +191,7 @@ public class Controller {
                     session.setAttribute("studentregistration", true);
                 }
                 Student newStudent = usersService.mapToStudentEntity(user);
-                Student foundStudent = studentsService.getStudentByLoginAndEmail(newStudent.getLogin(), newStudent.getEmail());
+                Student foundStudent = studentsService.getStudentByLoginAndEmail(newStudent.getLogin(), newStudent.getEmail().get());
                 if(foundStudent == null){
                     System.out.println("Student not found");
                     usersService.addAStudentToDB(newStudent);
@@ -207,7 +207,7 @@ public class Controller {
                     session.setAttribute("examinerregistration", true);
                 }
                 Examiner newExaminer = usersService.mapToExaminerEntity(user);
-                Examiner foundExaminer = examinerService.getExaminerByLoginAndEmail(newExaminer.getLogin(), newExaminer.getEmail());
+                Examiner foundExaminer = examinerService.getExaminerByLoginAndEmail(newExaminer.getLogin(), newExaminer.getEmail().get());
                 if(foundExaminer == null){
                     System.out.println("Examiner not found");
                     usersService.addAExaminerToDB(newExaminer);
@@ -216,7 +216,7 @@ public class Controller {
                 return new ModelAndView("register");
             case "Administrator":
                 Administrator newAdministrator = usersService.mapToAdministratorEntity(user);
-                Administrator foundAdministrator = administartorService.getAdministratorByLoginAndEmail(newAdministrator.getLogin(), newAdministrator.getEmail());
+                Administrator foundAdministrator = administartorService.getAdministratorByLoginAndEmail(newAdministrator.getLogin(), newAdministrator.getEmail().get());
                 if(foundAdministrator == null){
                     System.out.println("Administrator not found");
                     usersService.addAdministratorToDB(newAdministrator);

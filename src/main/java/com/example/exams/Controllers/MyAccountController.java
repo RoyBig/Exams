@@ -107,7 +107,7 @@ public class MyAccountController {
         for (GrantedAuthority authority : authorities) {
             if ("ROLE_ADMIN".equals(authority.getAuthority())) {
                 Administrator administrator = administartorService.getAdminById(user.getUserId());
-                administartorService.editAdministator(administrator.getAdministrator_id(),usersave.getFirstname()
+                administartorService.editAdministator(administrator.getStudentId(),usersave.getFirstname()
                         ,usersave.getLastname(),usersave.getLogin()
                         ,usersave.getPassword(),usersave.getEmail());
                 break;
@@ -115,7 +115,7 @@ public class MyAccountController {
             if ("ROLE_EXAMINER".equals(authority.getAuthority())) {
 
                 Examiner examiner = examinerService.findByLogin(user.getUsername());
-                examinerService.editExaminer(examiner.getExaminer_id(),usersave.getFirstname()
+                examinerService.editExaminer(examiner.getStudentId(),usersave.getFirstname()
                         ,usersave.getLastname(),usersave.getLogin()
                         ,usersave.getPassword(),usersave.getEmail());
                 break;
