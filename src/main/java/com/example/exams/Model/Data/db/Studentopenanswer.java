@@ -38,6 +38,19 @@ public class Studentopenanswer {
     @Field(name = "student_student")
     private Student studentStudent;
 
+    public Studentopenanswer(String id, Integer score, LocalDate date, LocalTime time, String description, OpenQuestion openquestionQuestionid, Student studentStudent) {
+        this.id = id;
+        this.score = score;
+        this.date = date;
+        this.time = time;
+        this.description = description;
+        this.openquestionQuestionid = openquestionQuestionid;
+        this.studentStudent = studentStudent;
+    }
+
+    public Studentopenanswer() {
+    }
+
     @Override
     public String toString() {
         return "Studentopenanswer{" +

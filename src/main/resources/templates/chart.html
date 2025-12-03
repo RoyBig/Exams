@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8" />
+    <title>MongoDB – wydajność operacji (z i bez indeksów)</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+            background: #ffffff;
+            color: #000000;
+        }
+        h1, h2, h3 {
+            text-align: center;
+        }
+
+        .chart-container {
+            width: 100%;
+            max-width: 1100px;
+            height: 620px;
+            margin: 0 auto 40px auto;
+            background: #ffffff;
+            padding: 20px;
+            box-sizing: border-box;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.15);
+        }
+
+        canvas {
+            width: 100% !important;
+            height: 100% !important;
+        }
+
+        .tables-wrapper {
+            width: 100%;
+            max-width: 1100px;
+            margin: 0 auto 40px auto;
+            background: #ffffff;
+            padding: 20px;
+            box-sizing: border-box;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.15);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 25px;
+            font-size: 14px;
+            background: #ffffff;
+        }
+
+        th, td {
+            border: 1px solid #ccc;
+            padding: 6px 8px;
+            text-align: center;
+            color: #000000;
+        }
+
+        th {
+            background: #f2f2f2;
+            font-weight: bold;
+        }
+
+        tr:nth-child(even) {
+            background: #fafafa;
+        }
+
+        tr:nth-child(odd) {
+            background: #ffffff;
+        }
+
+        .op-header {
+            text-align: left;
+            margin: 20px 0 5px 0;
+            font-size: 16px;
+            font-weight: bold;
+            color: #000000;
+        }
+    </style>
+</head>
+<body>
+
+<h1>MongoDB – wydajność operacji (z indeksami vs bez indeksów)</h1>
+
+<div class="chart-container">
+    <canvas id="chartWithIndexes"></canvas>
+</div>
+
+<div class="chart-container">
+    <canvas id="chartWithoutIndexes"></canvas>
+</div>
+
+<div class="tables-wrapper">
+    <h2>Tabelaryczne zestawienie wyników</h2>
+
+    <div class="op-header">Dodanie nowego egzaminu</div>
+    <table>
+        <thead>
+        <tr>
+            <th>Liczba egzaminów</th>
+            <th>Z indeksami [ms]</th>
+            <th>Bez indeksów [ms]</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr><td>1</td><td>0.901</td><td>0.390</td></tr>
+        <tr><td>100</td><td>0.722</td><td>0.356</td></tr>
+        <tr><td>2 000</td><td>0.640</td><td>0.350</td></tr>
+        <tr><td>4 000</td><td>0.571</td><td>0.351</td></tr>
+        <tr><td>8 000</td><td>0.541</td><td>0.379</td></tr>
+        <tr><td>20 000</td><td>0.465</td><td>0.418</td></tr>
+        </tbody>
+    </table>
+
+    <div class="op-header">Edycja egzaminu</div>
+    <table>
+        <thead>
+        <tr>
+            <th>Liczba egzaminów</th>
+            <th>Z indeksami [ms]</th>
+            <th>Bez indeksów [ms]</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr><td>1</td><td>6.425</td><td>5.558</td></tr>
+        <tr><td>100</td><td>45.963</td><td>37.375</td></tr>
+        <tr><td>2 000</td><td>657.073</td><td>667.711</td></tr>
+        <tr><td>4 000</td><td>1306.832</td><td>1342.331</td></tr>
+        <tr><td>8 000</td><td>2619.608</td><td>2576.404</td></tr>
+        <tr><td>20 000</td><td>6694.658</td><td>6622.445</td></tr>
+        </tbody>
+    </table>
+
+    <div class="op-header">Wyszukiwanie egzaminu po przedmiocie</div>
+    <table>
+        <thead>
+        <tr>
+            <th>Liczba egzaminów</th>
+            <th>Z indeksami [ms]</th>
+            <th>Bez indeksów [ms]</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr><td>1</td><td>7.158</td><td>5.804</td></tr>
+        <tr><td>100</td><td>41.570</td><td>36.947</td></tr>
+        <tr><td>2 000</td><td>650.610</td><td>674.992</td></tr>
+        <tr><td>4 000</td><td>1328.313</td><td>1316.096</td></tr>
+        <tr><td>8 000</td><td>2602.251</td><td>2604.322</td></tr>
+        <tr><td>20 000</td><td>6584.183</td><td>6651.081</td></tr>
+        </tbody>
+    </table>
+
+    <div class="op-header">Wyszukiwanie egzaminu po słowach (tekstowe)</div>
+    <table>
+        <thead>
+        <tr>
+            <th>Liczba egzaminów</th>
+            <th>Z indeksami – text search (ms)</th>
+            <th>Bez indeksów – containingIgnoreCase (ms)</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr><td>1</td><td>8.308</td><td>5.564</td></tr>
+        <tr><td>100</td><td>40.380</td><td>36.692</td></tr>
+        <tr><td>2 000</td><td>655.091</td><td>672.275</td></tr>
+        <tr><td>4 000</td><td>1319.761</td><td>1310.892</td></tr>
+        <tr><td>8 000</td><td>2589.313</td><td>2610.720</td></tr>
+        <tr><td>20 000</td><td>6593.083</td><td>6678.435</td></tr>
+        </tbody>
+    </table>
+
+    <div class="op-header">Pobranie listy nadchodzących egzaminów</div>
+    <table>
+        <thead>
+        <tr>
+            <th>Liczba egzaminów</th>
+            <th>Z indeksami [ms]</th>
+            <th>Bez indeksów [ms]</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr><td>1</td><td>2.103</td><td>2.036</td></tr>
+        <tr><td>100</td><td>7.746</td><td>7.212</td></tr>
+        <tr><td>2 000</td><td>103.463</td><td>108.566</td></tr>
+        <tr><td>4 000</td><td>236.065</td><td>213.692</td></tr>
+        <tr><td>8 000</td><td>448.883</td><td>446.052</td></tr>
+        <tr><td>20 000</td><td>1136.302</td><td>1145.402</td></tr>
+        </tbody>
+    </table>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    const axisColor = "#000000";
+
+    const configWithIndexes = {
+        type: 'line',
+        data: {
+            labels: ['1', '100', '2 000', '4 000', '8 000', '20 000'],
+            datasets: [
+                { label: 'Dodanie nowego egzaminu', data: [0.901, 0.722, 0.640, 0.571, 0.541, 0.465], borderColor: '#2ecc71', backgroundColor: '#2ecc7133', borderWidth: 4, pointRadius: 6, tension: 0.1 },
+                { label: 'Edycja egzaminu', data: [6.425, 45.963, 657.073, 1306.832, 2619.608, 6694.658], borderColor: '#e74c3c', backgroundColor: '#e74c3c33', borderWidth: 4, pointRadius: 6, tension: 0.1 },
+                { label: 'Wyszukiwanie egzaminu po przedmiocie', data: [7.158, 41.570, 650.610, 1328.313, 2602.251, 6584.183], borderColor: '#3498db', backgroundColor: '#3498db33', borderWidth: 4, pointRadius: 6, tension: 0.1 },
+                { label: 'Wyszukiwanie egzaminu po słowach', data: [8.308, 40.380, 655.091, 1319.761, 2589.313, 6593.083], borderColor: '#9b59b6', backgroundColor: '#9b59b633', borderWidth: 4, pointRadius: 6, tension: 0.1 },
+                { label: 'Pobranie listy nadchodzących egzaminów', data: [2.103, 7.746, 103.463, 236.065, 448.883, 1136.302], borderColor: '#f1c40f', backgroundColor: '#f1c40f33', borderWidth: 4, pointRadius: 6, tension: 0.1 }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                title: { display: true, text: 'MongoDB – wydajność operacji Z INDEKSAMI', color: axisColor, font: { size: 22, weight: 'bold' } },
+                legend: { labels: { color: axisColor, font: { size: 14 } } }
+            },
+            scales: {
+                x: { ticks: { color: axisColor }, title: { display: true, text: 'Liczba egzaminów w bazie', color: axisColor }, grid: { color: 'rgba(0,0,0,0.1)' } },
+                y: { ticks: { color: axisColor }, title: { display: true, text: 'Czas wykonania [ms]', color: axisColor }, grid: { color: 'rgba(0,0,0,0.1)' }, beginAtZero: true }
+            }
+        }
+    };
+
+    const configWithoutIndexes = {
+        type: 'line',
+        data: {
+            labels: ['1', '100', '2 000', '4 000', '8 000', '20 000'],
+            datasets: [
+                { label: 'Dodanie nowego egzaminu', data: [0.390, 0.356, 0.350, 0.351, 0.379, 0.418], borderColor: '#2ecc71', backgroundColor: '#2ecc7133', borderWidth: 4, pointRadius: 6, tension: 0.1 },
+                { label: 'Edycja egzaminu', data: [5.558, 37.375, 667.711, 1342.331, 2576.404, 6622.445], borderColor: '#e74c3c', backgroundColor: '#e74c3c33', borderWidth: 4, pointRadius: 6, tension: 0.1 },
+                { label: 'Wyszukiwanie egzaminu po przedmiocie', data: [5.804, 36.947, 674.992, 1316.096, 2604.322, 6651.081], borderColor: '#3498db', backgroundColor: '#3498db33', borderWidth: 4, pointRadius: 6, tension: 0.1 },
+                { label: 'Wyszukiwanie egzaminu po słowach', data: [5.564, 36.692, 672.275, 1310.892, 2610.720, 6678.435], borderColor: '#9b59b6', backgroundColor: '#9b59b633', borderWidth: 4, pointRadius: 6, tension: 0.1 },
+                { label: 'Pobranie listy nadchodzących egzaminów', data: [2.036, 7.212, 108.566, 213.692, 446.052, 1145.402], borderColor: '#f1c40f', backgroundColor: '#f1c40f33', borderWidth: 4, pointRadius: 6, tension: 0.1 }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                title: { display: true, text: 'MongoDB – wydajność operacji BEZ INDEKSÓW', color: axisColor, font: { size: 22, weight: 'bold' } },
+                legend: { labels: { color: axisColor } }
+            },
+            scales: {
+                x: { ticks: { color: axisColor }, title: { display: true, text: 'Liczba egzaminów w bazie', color: axisColor }, grid: { color: 'rgba(0,0,0,0.1)' } },
+                y: { ticks: { color: axisColor }, title: { display: true, text: 'Czas wykonania [ms]', color: axisColor }, grid: { color: 'rgba(0,0,0,0.1)' }, beginAtZero: true }
+            }
+        }
+    };
+
+    new Chart(document.getElementById('chartWithIndexes'), configWithIndexes);
+    new Chart(document.getElementById('chartWithoutIndexes'), configWithoutIndexes);
+</script>
+
+</body>
+</html>

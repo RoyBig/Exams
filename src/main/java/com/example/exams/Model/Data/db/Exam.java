@@ -3,6 +3,10 @@ package com.example.exams.Model.Data.db;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.CompoundIndex;
+import org.springframework.data.mongodb.core.index.CompoundIndexes;
+import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.index.TextIndexed;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
@@ -16,6 +20,10 @@ import java.util.List;
 @Getter
 @Setter
 @Document(collection = "exam")
+@CompoundIndexes({
+        @CompoundIndex(name = "idx_startDate_endDate_visibility", def = "{'start_date': 1, 'end_date': 1, 'visibility': 1}"),
+        @CompoundIndex(name = "idx_subject_examiner", def = "{'exams_subject.$id': 1, 'conducting_examiner.$id': 1}")
+})
 public class Exam {
 
     @Id
@@ -28,15 +36,18 @@ public class Exam {
     private Boolean questionPoolStrategy;
 
     @Field(name = "description")
+    @TextIndexed
     private String description;
 
     @Field(name = "start_date")
+    @Indexed(name = "idx_startDate")
     private LocalDate startDate;
 
     @Field(name = "start_time")
     private LocalTime startTime;
 
     @Field(name = "end_date")
+    @Indexed(name = "idx_endDate")
     private LocalDate endDate;
 
     @Field(name = "end_time")
@@ -46,6 +57,7 @@ public class Exam {
     private Long duration;
 
     @Field(name = "visibility")
+    @Indexed(name = "idx_visibility")
     private Boolean visibility;
 
     @DBRef

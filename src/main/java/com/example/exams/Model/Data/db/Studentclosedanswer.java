@@ -35,6 +35,19 @@ public class Studentclosedanswer {
     @Field(name = "student_student")
     private Student studentStudent;
 
+    public Studentclosedanswer(String id, Boolean correctness, LocalDate date, Answerclosed answerclosedAnswerid, Closedquestion closedquestionQuestionid, Student studentStudent) {
+        this.id = id;
+        this.correctness = correctness;
+        this.date = date;
+        this.answerclosedAnswerid = answerclosedAnswerid;
+        this.closedquestionQuestionid = closedquestionQuestionid;
+        this.studentStudent = studentStudent;
+    }
+
+    public Studentclosedanswer() {
+
+    }
+
     @Override
     public String toString() {
         return "Studentclosedanswer{" +
