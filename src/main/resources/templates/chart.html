@@ -7,9 +7,9 @@
         body {
             margin: 0;
             padding: 20px;
-            font-family: Arial, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: #ffffff;
-            color: #000000;
+            color: #333;
         }
         h1, h2, h3 {
             text-align: center;
@@ -18,13 +18,14 @@
         .chart-container {
             width: 100%;
             max-width: 1100px;
-            height: 620px;
-            margin: 0 auto 40px auto;
-            background: #ffffff;
+            height: 600px;
+            margin: 0 auto 50px auto;
+            background: #fff;
             padding: 20px;
             box-sizing: border-box;
-            border-radius: 10px;
-            box-shadow: 0 0 15px rgba(0, 0, 0, 0.15);
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            border: 1px solid #eee;
         }
 
         canvas {
@@ -35,54 +36,52 @@
         .tables-wrapper {
             width: 100%;
             max-width: 1100px;
-            margin: 0 auto 40px auto;
-            background: #ffffff;
-            padding: 20px;
+            margin: 0 auto 50px auto;
+            background: #fff;
+            padding: 30px;
             box-sizing: border-box;
-            border-radius: 10px;
-            box-shadow: 0 0 15px rgba(0, 0, 0, 0.15);
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            border: 1px solid #eee;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 25px;
+            margin-bottom: 30px;
             font-size: 14px;
-            background: #ffffff;
         }
 
         th, td {
-            border: 1px solid #ccc;
-            padding: 6px 8px;
+            border: 1px solid #e0e0e0;
+            padding: 10px;
             text-align: center;
-            color: #000000;
         }
 
         th {
-            background: #f2f2f2;
-            font-weight: bold;
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #444;
         }
 
         tr:nth-child(even) {
-            background: #fafafa;
-        }
-
-        tr:nth-child(odd) {
-            background: #ffffff;
+            background: #fcfcfc;
         }
 
         .op-header {
             text-align: left;
-            margin: 20px 0 5px 0;
+            margin: 20px 0 10px 0;
             font-size: 16px;
-            font-weight: bold;
-            color: #000000;
+            font-weight: 700;
+            color: #2c3e50;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 5px;
         }
     </style>
 </head>
 <body>
 
-<h1>MongoDB – wydajność operacji (z indeksami vs bez indeksów)</h1>
+<h1>MongoDB – Analiza Wydajności</h1>
 
 <div class="chart-container">
     <canvas id="chartWithIndexes"></canvas>
@@ -93,13 +92,13 @@
 </div>
 
 <div class="tables-wrapper">
-    <h2>Tabelaryczne zestawienie wyników</h2>
+    <h2>Szczegółowe wyniki pomiarów</h2>
 
-    <div class="op-header">Dodanie nowego egzaminu</div>
+    <div class="op-header">1. Dodanie nowego egzaminu (Insert)</div>
     <table>
         <thead>
         <tr>
-            <th>Liczba egzaminów</th>
+            <th>Liczba rekordów</th>
             <th>Z indeksami [ms]</th>
             <th>Bez indeksów [ms]</th>
         </tr>
@@ -114,11 +113,11 @@
         </tbody>
     </table>
 
-    <div class="op-header">Edycja egzaminu</div>
+    <div class="op-header">2. Edycja egzaminu (Update)</div>
     <table>
         <thead>
         <tr>
-            <th>Liczba egzaminów</th>
+            <th>Liczba rekordów</th>
             <th>Z indeksami [ms]</th>
             <th>Bez indeksów [ms]</th>
         </tr>
@@ -133,11 +132,11 @@
         </tbody>
     </table>
 
-    <div class="op-header">Wyszukiwanie egzaminu po przedmiocie</div>
+    <div class="op-header">3. Wyszukiwanie po przedmiocie (Find by Subject)</div>
     <table>
         <thead>
         <tr>
-            <th>Liczba egzaminów</th>
+            <th>Liczba rekordów</th>
             <th>Z indeksami [ms]</th>
             <th>Bez indeksów [ms]</th>
         </tr>
@@ -152,13 +151,13 @@
         </tbody>
     </table>
 
-    <div class="op-header">Wyszukiwanie egzaminu po słowach (tekstowe)</div>
+    <div class="op-header">4. Wyszukiwanie tekstowe (Text Search)</div>
     <table>
         <thead>
         <tr>
-            <th>Liczba egzaminów</th>
-            <th>Z indeksami – text search (ms)</th>
-            <th>Bez indeksów – containingIgnoreCase (ms)</th>
+            <th>Liczba rekordów</th>
+            <th>Z indeksami (Text) [ms]</th>
+            <th>Bez indeksów (Regex) [ms]</th>
         </tr>
         </thead>
         <tbody>
@@ -171,11 +170,11 @@
         </tbody>
     </table>
 
-    <div class="op-header">Pobranie listy nadchodzących egzaminów</div>
+    <div class="op-header">5. Nadchodzące egzaminy (Range Query)</div>
     <table>
         <thead>
         <tr>
-            <th>Liczba egzaminów</th>
+            <th>Liczba rekordów</th>
             <th>Z indeksami [ms]</th>
             <th>Bez indeksów [ms]</th>
         </tr>
@@ -189,67 +188,125 @@
         <tr><td>20 000</td><td>1136.302</td><td>1145.402</td></tr>
         </tbody>
     </table>
+
+    <div class="op-header">6. Usuwanie pętlą (Delete Loop 1-by-1)</div>
+    <table>
+        <thead>
+        <tr>
+            <th>Liczba rekordów</th>
+            <th>Z indeksami [ms]</th>
+            <th>Bez indeksów [ms]</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr><td>1</td><td>3.333</td><td>2.345</td></tr>
+        <tr><td>100</td><td>112.905</td><td>73.765</td></tr>
+        <tr><td>2 000</td><td>1395.076</td><td>1143.329</td></tr>
+        <tr><td>4 000</td><td>2750.013</td><td>2242.359</td></tr>
+        <tr><td>8 000</td><td>5574.382</td><td>4471.056</td></tr>
+        <tr><td>20 000</td><td>16009.432</td><td>11278.504</td></tr>
+        </tbody>
+    </table>
+
+    <div class="op-header">7. Usuwanie masowe (Delete All/Bulk)</div>
+    <table>
+        <thead>
+        <tr>
+            <th>Liczba rekordów</th>
+            <th>Z indeksami [ms]</th>
+            <th>Bez indeksów [ms]</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr><td>1</td><td>1.104</td><td>1.084</td></tr>
+        <tr><td>100</td><td>4.443</td><td>1.308</td></tr>
+        <tr><td>2 000</td><td>84.987</td><td>6.072</td></tr>
+        <tr><td>4 000</td><td>168.209</td><td>11.807</td></tr>
+        <tr><td>8 000</td><td>344.091</td><td>24.533</td></tr>
+        <tr><td>20 000</td><td>891.071</td><td>56.518</td></tr>
+        </tbody>
+    </table>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
-    const axisColor = "#000000";
 
-    const configWithIndexes = {
+    const colors = {
+        insert: '#32CD32',
+        update: '#FF0000',
+        searchSub: '#0000FF',
+        searchText: '#8A2BE2',
+        upcoming: '#FFD700',
+        delLoop: '#FF8C00',
+        delBulk: '#00CED1'
+    };
+
+    const commonOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                labels: { font: { size: 12 }, boxWidth: 20, usePointStyle: true },
+                position: 'top'
+            }
+        },
+        scales: {
+            x: {
+                title: { display: true, text: 'Liczba egzaminów w bazie', font: { weight: 'bold' } },
+                grid: { color: '#f0f0f0' }
+            },
+            y: {
+                title: { display: true, text: 'Czas wykonania [ms]', font: { weight: 'bold' } },
+                grid: { color: '#f0f0f0' },
+                beginAtZero: true
+            }
+        },
+        elements: {
+            line: { tension: 0.3 },
+            point: { radius: 4, hitRadius: 10, hoverRadius: 6 }
+        }
+    };
+
+    new Chart(document.getElementById('chartWithIndexes'), {
         type: 'line',
         data: {
             labels: ['1', '100', '2 000', '4 000', '8 000', '20 000'],
             datasets: [
-                { label: 'Dodanie nowego egzaminu', data: [0.901, 0.722, 0.640, 0.571, 0.541, 0.465], borderColor: '#2ecc71', backgroundColor: '#2ecc7133', borderWidth: 4, pointRadius: 6, tension: 0.1 },
-                { label: 'Edycja egzaminu', data: [6.425, 45.963, 657.073, 1306.832, 2619.608, 6694.658], borderColor: '#e74c3c', backgroundColor: '#e74c3c33', borderWidth: 4, pointRadius: 6, tension: 0.1 },
-                { label: 'Wyszukiwanie egzaminu po przedmiocie', data: [7.158, 41.570, 650.610, 1328.313, 2602.251, 6584.183], borderColor: '#3498db', backgroundColor: '#3498db33', borderWidth: 4, pointRadius: 6, tension: 0.1 },
-                { label: 'Wyszukiwanie egzaminu po słowach', data: [8.308, 40.380, 655.091, 1319.761, 2589.313, 6593.083], borderColor: '#9b59b6', backgroundColor: '#9b59b633', borderWidth: 4, pointRadius: 6, tension: 0.1 },
-                { label: 'Pobranie listy nadchodzących egzaminów', data: [2.103, 7.746, 103.463, 236.065, 448.883, 1136.302], borderColor: '#f1c40f', backgroundColor: '#f1c40f33', borderWidth: 4, pointRadius: 6, tension: 0.1 }
+                { label: 'Dodanie (Insert)', data: [0.901, 0.722, 0.640, 0.571, 0.541, 0.465], borderColor: colors.insert, backgroundColor: colors.insert, borderWidth: 2 },
+                { label: 'Edycja (Update)', data: [6.425, 45.963, 657.073, 1306.832, 2619.608, 6694.658], borderColor: colors.update, backgroundColor: colors.update, borderWidth: 2 },
+                { label: 'Szukanie (Przedmiot)', data: [7.158, 41.570, 650.610, 1328.313, 2602.251, 6584.183], borderColor: colors.searchSub, backgroundColor: colors.searchSub, borderWidth: 2 },
+                { label: 'Szukanie (Tekst)', data: [8.308, 40.380, 655.091, 1319.761, 2589.313, 6593.083], borderColor: colors.searchText, backgroundColor: colors.searchText, borderWidth: 2 },
+                { label: 'Nadchodzące (Range)', data: [2.103, 7.746, 103.463, 236.065, 448.883, 1136.302], borderColor: colors.upcoming, backgroundColor: colors.upcoming, borderWidth: 2 },
+                { label: 'Usuwanie (Pętla)', data: [3.333, 112.905, 1395.076, 2750.013, 5574.382, 16009.432], borderColor: colors.delLoop, backgroundColor: colors.delLoop, borderWidth: 3, borderDash: [5, 5] },
+                { label: 'Usuwanie (Bulk)', data: [1.104, 4.443, 84.987, 168.209, 344.091, 891.071], borderColor: colors.delBulk, backgroundColor: colors.delBulk, borderWidth: 2 }
             ]
         },
         options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                title: { display: true, text: 'MongoDB – wydajność operacji Z INDEKSAMI', color: axisColor, font: { size: 22, weight: 'bold' } },
-                legend: { labels: { color: axisColor, font: { size: 14 } } }
-            },
-            scales: {
-                x: { ticks: { color: axisColor }, title: { display: true, text: 'Liczba egzaminów w bazie', color: axisColor }, grid: { color: 'rgba(0,0,0,0.1)' } },
-                y: { ticks: { color: axisColor }, title: { display: true, text: 'Czas wykonania [ms]', color: axisColor }, grid: { color: 'rgba(0,0,0,0.1)' }, beginAtZero: true }
-            }
+            ...commonOptions,
+            plugins: { ...commonOptions.plugins, title: { display: true, text: 'Wydajność Z INDEKSAMI', font: { size: 18 } } }
         }
-    };
+    });
 
-    const configWithoutIndexes = {
+    new Chart(document.getElementById('chartWithoutIndexes'), {
         type: 'line',
         data: {
             labels: ['1', '100', '2 000', '4 000', '8 000', '20 000'],
             datasets: [
-                { label: 'Dodanie nowego egzaminu', data: [0.390, 0.356, 0.350, 0.351, 0.379, 0.418], borderColor: '#2ecc71', backgroundColor: '#2ecc7133', borderWidth: 4, pointRadius: 6, tension: 0.1 },
-                { label: 'Edycja egzaminu', data: [5.558, 37.375, 667.711, 1342.331, 2576.404, 6622.445], borderColor: '#e74c3c', backgroundColor: '#e74c3c33', borderWidth: 4, pointRadius: 6, tension: 0.1 },
-                { label: 'Wyszukiwanie egzaminu po przedmiocie', data: [5.804, 36.947, 674.992, 1316.096, 2604.322, 6651.081], borderColor: '#3498db', backgroundColor: '#3498db33', borderWidth: 4, pointRadius: 6, tension: 0.1 },
-                { label: 'Wyszukiwanie egzaminu po słowach', data: [5.564, 36.692, 672.275, 1310.892, 2610.720, 6678.435], borderColor: '#9b59b6', backgroundColor: '#9b59b633', borderWidth: 4, pointRadius: 6, tension: 0.1 },
-                { label: 'Pobranie listy nadchodzących egzaminów', data: [2.036, 7.212, 108.566, 213.692, 446.052, 1145.402], borderColor: '#f1c40f', backgroundColor: '#f1c40f33', borderWidth: 4, pointRadius: 6, tension: 0.1 }
+                { label: 'Dodanie (Insert)', data: [0.390, 0.356, 0.350, 0.351, 0.379, 0.418], borderColor: colors.insert, backgroundColor: colors.insert, borderWidth: 2 },
+                { label: 'Edycja (Update)', data: [5.558, 37.375, 667.711, 1342.331, 2576.404, 6622.445], borderColor: colors.update, backgroundColor: colors.update, borderWidth: 2 },
+                { label: 'Szukanie (Przedmiot)', data: [5.804, 36.947, 674.992, 1316.096, 2604.322, 6651.081], borderColor: colors.searchSub, backgroundColor: colors.searchSub, borderWidth: 2 },
+                { label: 'Szukanie (Tekst)', data: [5.564, 36.692, 672.275, 1310.892, 2610.720, 6678.435], borderColor: colors.searchText, backgroundColor: colors.searchText, borderWidth: 2 },
+                { label: 'Nadchodzące (Range)', data: [2.036, 7.212, 108.566, 213.692, 446.052, 1145.402], borderColor: colors.upcoming, backgroundColor: colors.upcoming, borderWidth: 2 },
+                { label: 'Usuwanie (Pętla)', data: [2.345, 73.765, 1143.329, 2242.359, 4471.056, 11278.504], borderColor: colors.delLoop, backgroundColor: colors.delLoop, borderWidth: 3, borderDash: [5, 5] },
+                { label: 'Usuwanie (Bulk)', data: [1.084, 1.308, 6.072, 11.807, 24.533, 56.518], borderColor: colors.delBulk, backgroundColor: colors.delBulk, borderWidth: 2 }
             ]
         },
         options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                title: { display: true, text: 'MongoDB – wydajność operacji BEZ INDEKSÓW', color: axisColor, font: { size: 22, weight: 'bold' } },
-                legend: { labels: { color: axisColor } }
-            },
-            scales: {
-                x: { ticks: { color: axisColor }, title: { display: true, text: 'Liczba egzaminów w bazie', color: axisColor }, grid: { color: 'rgba(0,0,0,0.1)' } },
-                y: { ticks: { color: axisColor }, title: { display: true, text: 'Czas wykonania [ms]', color: axisColor }, grid: { color: 'rgba(0,0,0,0.1)' }, beginAtZero: true }
-            }
+            ...commonOptions,
+            plugins: { ...commonOptions.plugins, title: { display: true, text: 'Wydajność BEZ INDEKSÓW', font: { size: 18 } } }
         }
-    };
-
-    new Chart(document.getElementById('chartWithIndexes'), configWithIndexes);
-    new Chart(document.getElementById('chartWithoutIndexes'), configWithoutIndexes);
+    });
 </script>
 
 </body>

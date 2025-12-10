@@ -55,7 +55,6 @@ public class PerformanceTestFinal {
 
             measure("insert jednego (save)            ", () -> examRepository.save(generateExam()));
             measure("update jednego                   ", () -> updateFirst());
-            measure("delete + insert back             ", () -> deleteAndInsertBack());
             measure("findCurrentlyActiveExams()       ", () -> examRepository.findCurrentlyActiveExams(TODAY));
             measure("findUpcomingExams()              ", () -> examRepository.findUpcomingExams(TODAY, TODAY.plusDays(90)));
             measure("findByExamsSubjectId()           ", () -> examRepository.findByExamsSubjectId("subject123"));
@@ -67,6 +66,19 @@ public class PerformanceTestFinal {
             } else {
                 measure("text search (containingIgnoreCase)", () -> examRepository.findByDescriptionContainingIgnoreCase("java"));
             }
+
+            prepareDataForDelete(size);
+            measureDeleteOperation("DELETE LOOP (jeden po drugim)    ", () -> {
+                List<Exam> all = examRepository.findAll();
+                for (Exam exam : all) {
+                    examRepository.deleteById(exam.getId());
+                }
+            });
+
+            prepareDataForDelete(size);
+            measureDeleteOperation("DELETE ALL (wszystko naraz)      ", () -> {
+                examRepository.deleteAll();
+            });
         }
     }
 
@@ -82,6 +94,18 @@ public class PerformanceTestFinal {
         }
         double avgMs = total / runs / 1_000_000.0;
         System.out.printf("%-40s → %8.3f ms%n", name, avgMs);
+    }
+
+    private void measureDeleteOperation(String name, Runnable task) {
+        long start = System.nanoTime();
+        task.run();
+        double durationMs = (System.nanoTime() - start) / 1_000_000.0;
+        System.out.printf("%-40s → %8.3f ms (1 run)%n", name, durationMs);
+    }
+
+    private void prepareDataForDelete(int targetSize) {
+        examRepository.deleteAll();
+        insertTestData(targetSize);
     }
 
     private void clearCollection() {
@@ -121,14 +145,11 @@ public class PerformanceTestFinal {
     }
 
     private void updateFirst() {
-        Exam exam = examRepository.findAll().get(0);
-        exam.setDescription("updated " + System.nanoTime());
-        examRepository.save(exam);
-    }
-
-    private void deleteAndInsertBack() {
-        Exam exam = examRepository.findAll().get(0);
-        examRepository.deleteById(exam.getId());
-        examRepository.save(generateExam());
+        List<Exam> all = examRepository.findAll();
+        if (!all.isEmpty()) {
+            Exam exam = all.get(0);
+            exam.setDescription("updated " + System.nanoTime());
+            examRepository.save(exam);
+        }
     }
 }
